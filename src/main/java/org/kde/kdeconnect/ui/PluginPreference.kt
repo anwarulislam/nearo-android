@@ -65,7 +65,7 @@ class PluginPreference : SwitchPreference {
                 super.onInitializeAccessibilityNodeInfo(host, info)
                 info.className = android.widget.Switch::class.java.name
                 info.isCheckable = true
-                info.isChecked = isChecked
+                info.setChecked(if (isChecked) AccessibilityNodeInfoCompat.CHECKED_STATE_TRUE else AccessibilityNodeInfoCompat.CHECKED_STATE_FALSE)
             }
         })
         widget.setOnClickListener(toggleListener)
@@ -96,6 +96,8 @@ class PluginPreference : SwitchPreference {
         widget.importantForAccessibility = if (hasDetails) View.IMPORTANT_FOR_ACCESSIBILITY_YES else View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         widget.isFocusable = hasDetails
         content.isFocusable = hasDetails
+        val stateLabel = if (isEnabled) androidx.appcompat.R.string.abc_capital_on else androidx.appcompat.R.string.abc_capital_off
+        ViewCompat.setStateDescription(parent, if (hasDetails) null else context.getString(stateLabel))
         parent.isFocusable = !hasDetails
         divider.visibility = if (hasDetails) View.VISIBLE else View.GONE
         content.isClickable = hasDetails

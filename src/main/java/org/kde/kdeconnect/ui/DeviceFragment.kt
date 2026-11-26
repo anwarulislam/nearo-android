@@ -104,7 +104,6 @@ class DeviceFragment : BaseFragment<ActivityDeviceBinding>() {
                     ).joinToString("\n\n"))
                     .setPositiveButton(R.string.ok, null)
                     .show()
-                Unit
             })
         }
         if (device.isPaired) {

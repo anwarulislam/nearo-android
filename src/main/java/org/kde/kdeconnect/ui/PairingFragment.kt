@@ -225,10 +225,7 @@ class PairingFragment : BaseFragment<DevicesListBinding>() {
     }
 
     fun deviceClicked(device: Device) {
-        (activity as? MainActivity)?.onDeviceSelected(
-            device.deviceId,
-            !device.isPaired || !device.isReachable
-        )
+        (activity as? MainActivity)?.onDeviceSelected(device.deviceId, fromDeviceList = true)
     }
 
     companion object {

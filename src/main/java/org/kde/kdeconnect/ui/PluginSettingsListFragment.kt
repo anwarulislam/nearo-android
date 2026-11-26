@@ -16,7 +16,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -25,7 +24,7 @@ import org.kde.kdeconnect.KdeConnect
 import org.kde.kdeconnect.plugins.PluginFactory
 import org.kde.kdeconnect_tp.R
 
-class PluginSettingsListFragment : PreferenceFragmentCompat() {
+class PluginSettingsListFragment : MaterialSettingsFragment() {
     private var callback: PluginPreference.PluginPreferenceCallback? = null
     private var recyclerViewLayoutManagerState: Parcelable? = null
 

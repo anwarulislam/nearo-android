@@ -88,7 +88,7 @@ class TrustedNetworksActivity : BaseActivity<TrustedNetworkListBinding>() {
         if (allAllowed) {
             return
         }
-        trustedNetworksView.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, trustedNetworks)
+        trustedNetworksView.adapter = ArrayAdapter(this, R.layout.nearo_text_row, trustedNetworks)
         trustedNetworksView.onItemClickListener =
             OnItemClickListener { _, _, position, _ ->
                 val targetItem = trustedNetworks[position]

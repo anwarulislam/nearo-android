@@ -17,7 +17,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     android:paddingTop="10dp">
 
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
@@ -25,7 +25,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/storageLocation"
-            style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox"
+            style="@style/Widget.Material3.TextInputEditText.FilledBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:cursorVisible="false"
@@ -37,13 +37,13 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:ellipsize="end"
             android:inputType="text"
             android:text="@string/sftp_storage_preference_click_to_select"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:editable="false"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/storageDisplayNameInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
@@ -51,7 +51,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/storageDisplayName"
-            style="@style/Widget.MaterialComponents.TextInputEditText.FilledBox.Dense"
+            style="@style/Widget.Material3.TextInputEditText.FilledBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sftp_storage_preference_display_name"

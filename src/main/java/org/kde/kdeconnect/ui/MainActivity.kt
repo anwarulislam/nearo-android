@@ -35,6 +35,8 @@ import org.kde.kdeconnect_tp.databinding.ActivityMainBinding
 
 private const val STATE_SELECTED_DEVICE = "selected_device" //Saved persistently in preferences
 
+private const val STATE_FROM_DEVICE_LIST = "from_device_list"
+
 class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val upfrontPermissionsLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
@@ -51,9 +53,10 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     }
 
     private var currentDeviceId: String? = null
+    private var selectedFromList = false
     private val preferences: SharedPreferences by lazy { getSharedPreferences("stored_menu_selection", MODE_PRIVATE) }
     private val returnToDevices = object : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() = onDeviceSelected(currentDeviceId)
+        override fun handleOnBackPressed() = onDeviceSelected(currentDeviceId, selectedFromList)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +75,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         onBackPressedDispatcher.addCallback(this, returnToDevices)
         binding.destinations.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.destination_devices -> onDeviceSelected(currentDeviceId)
+                R.id.destination_devices -> onDeviceSelected(currentDeviceId, selectedFromList)
                 R.id.destination_settings -> showDestination(item.itemId, SettingsFragment())
                 R.id.destination_about -> showDestination(item.itemId, AboutFragment.newInstance())
             }
@@ -84,6 +87,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         if (savedInstanceState != null) {
             currentDeviceId = savedInstanceState.getString(STATE_SELECTED_DEVICE)
+            selectedFromList = savedInstanceState.getBoolean(STATE_FROM_DEVICE_LIST)
             // Older versions stored a drawer item index. The restored fragment is authoritative.
             selectDestination(when (currentFragment) {
                 is SettingsFragment -> R.id.destination_settings
@@ -176,6 +180,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     fun onDeviceSelected(deviceId: String?, fromDeviceList: Boolean = false) {
         currentDeviceId = deviceId
+        selectedFromList = fromDeviceList
         preferences.edit { putString(STATE_SELECTED_DEVICE, deviceId) }
         val fragment = deviceId?.let { DeviceFragment.newInstance(it, fromDeviceList) } ?: PairingFragment()
         showDestination(R.id.destination_devices, fragment)
@@ -200,6 +205,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(STATE_SELECTED_DEVICE, currentDeviceId)
+        outState.putBoolean(STATE_FROM_DEVICE_LIST, selectedFromList)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {

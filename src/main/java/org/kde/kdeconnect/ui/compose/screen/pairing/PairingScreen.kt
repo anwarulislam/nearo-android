@@ -163,8 +163,14 @@ private fun DiscoveryPanel(
                     Text(stringResource(R.string.refresh), Modifier.padding(start = 8.dp))
                 }
                 KdeOverflowMenu { dismiss ->
-                    KdeDropdownMenuItem(stringResource(R.string.custom_device_list)) { dismiss(); onAddByIpClick() }
-                    KdeDropdownMenuItem(stringResource(R.string.trusted_networks)) { dismiss(); onTrustedNetworksClick() }
+                    KdeDropdownMenuItem(stringResource(R.string.custom_device_list)) {
+                        dismiss()
+                        onAddByIpClick()
+                    }
+                    KdeDropdownMenuItem(stringResource(R.string.trusted_networks)) {
+                        dismiss()
+                        onTrustedNetworksClick()
+                    }
                 }
             }
         }

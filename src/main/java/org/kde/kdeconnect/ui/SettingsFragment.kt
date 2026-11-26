@@ -15,7 +15,6 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.Spanned
-import android.view.View
 import android.widget.EditText
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,7 +24,6 @@ import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -34,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kde.kdeconnect.KdeConnect
 import org.kde.kdeconnect.BackgroundService
-import org.kde.kdeconnect.extensions.setupBottomPadding
 import org.kde.kdeconnect.helpers.CreateFileParams
 import org.kde.kdeconnect.helpers.CreateFileResultContract
 import org.kde.kdeconnect.helpers.DeviceHelper
@@ -44,7 +41,7 @@ import org.kde.kdeconnect.ui.ThemeUtil.applyTheme
 import org.kde.kdeconnect_tp.BuildConfig
 import org.kde.kdeconnect_tp.R
 
-class SettingsFragment : PreferenceFragmentCompat() {
+class SettingsFragment : MaterialSettingsFragment() {
     private lateinit var pluginSettings: PreferenceCategory
     private var listedDevices: List<Pair<String, String>>? = null
 
@@ -90,12 +87,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         )
 
         preferenceScreen = screen
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setDivider(null)
-        listView.setupBottomPadding()
     }
 
     override fun onDestroyView() {

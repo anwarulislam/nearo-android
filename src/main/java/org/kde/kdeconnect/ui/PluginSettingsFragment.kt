@@ -7,14 +7,13 @@ package org.kde.kdeconnect.ui
 
 import android.content.Context
 import android.os.Bundle
-import androidx.preference.PreferenceFragmentCompat
 import org.kde.kdeconnect.Device
 import org.kde.kdeconnect.KdeConnect
 import org.kde.kdeconnect.plugins.Plugin
 import org.kde.kdeconnect.plugins.PluginFactory
 import org.kde.kdeconnect_tp.R
 
-open class PluginSettingsFragment : PreferenceFragmentCompat() {
+open class PluginSettingsFragment : MaterialSettingsFragment() {
     private lateinit var pluginKey: String
     private lateinit var layouts: IntArray
 

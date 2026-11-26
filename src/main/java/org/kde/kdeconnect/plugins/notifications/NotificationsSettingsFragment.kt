@@ -268,7 +268,7 @@ class NotificationsSettingsFragment : PluginSettingsFragment() {
 
             val lv = mView.findViewById<ListView>(R.id.extra_options_list)
             val options = arrayOf(getString(R.string.privacy_options))
-            val extraOptionsAdapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, options)
+            val extraOptionsAdapter = ArrayAdapter(context, R.layout.nearo_text_row, options)
             lv.adapter = extraOptionsAdapter
             builder.setView(mView)
 
