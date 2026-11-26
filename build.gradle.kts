@@ -39,7 +39,7 @@ android {
     compileSdk = 37
     defaultConfig {
         applicationId = providers.gradleProperty("personalApplicationId").orElse("com.nearo.connect").get()
-        minSdk = 23
+        minSdk = 24
         targetSdk = 37
         versionCode = providers.gradleProperty("personalVersionCode").map { it.toInt() }.orElse(13703).get()
         versionName = "1.37.3"

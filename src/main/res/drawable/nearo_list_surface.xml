@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="12dp" android:insetRight="12dp" android:insetTop="2dp" android:insetBottom="2dp">
+    <ripple android:color="?attr/colorControlHighlight">
+        <item>
+            <shape>
+                <solid android:color="?attr/colorSurfaceContainer" />
+                <corners android:radius="18dp" />
+            </shape>
+        </item>
+    </ripple>
+</inset>

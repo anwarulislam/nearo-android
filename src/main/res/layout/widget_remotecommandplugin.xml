@@ -12,12 +12,14 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     android:theme="@style/KdeConnectTheme"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="?colorSurface"
+    android:background="@drawable/nearo_control_surface"
+    android:clipToOutline="true"
     tools:ignore="RtlSymmetry">
 
     <LinearLayout
         android:id="@+id/widget_title_wrapper"
-        android:background="?colorSecondary"
+        android:background="?attr/colorPrimaryContainer"
+        android:minHeight="48dp"
         android:gravity="center_vertical|start"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -29,7 +31,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_kde_24dp"
-            android:tint="?attr/colorOnSecondary"
+            android:tint="?attr/colorOnPrimaryContainer"
             android:importantForAccessibility="no"
             tools:ignore="UseAppTint"/> <!-- can't use app:tint in RemoteView -->
 
@@ -41,8 +43,8 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:text="@string/kde_connect"
             android:fadingEdge="horizontal"
             android:singleLine="true"
-            android:textColor="?attr/colorOnSecondary"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textColor="?attr/colorOnPrimaryContainer"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
     </LinearLayout>
 
     <ListView
@@ -61,7 +63,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         android:gravity="center_vertical"
         android:paddingStart="8dip"
         android:text="@string/runcommand_notreachable"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
         android:drawableStart="@drawable/ic_error_outline_48dp"
         tools:ignore="UseCompatTextViewDrawableXml" />  <!-- can't use app:drawableStart in RemoteView -->
 </LinearLayout>

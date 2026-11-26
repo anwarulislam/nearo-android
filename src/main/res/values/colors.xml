@@ -3,6 +3,10 @@
 
     <color name="launcher_background">#3daee9</color>
 
+    <color name="nearo_ink">#24254D</color>
+    <color name="nearo_on_ink">#F7F4FF</color>
+    <color name="nearo_lime">#D9F8A7</color>
+
     <!-- Whenever possible, don't hardcode colors here and rely on the default ones (eg: from the system or user theme) -->
 
 </resources>

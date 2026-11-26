@@ -1,6 +1,7 @@
 package org.kde.kdeconnect.plugins.runcommand
 
 import androidx.activity.OnBackPressedDispatcher
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -8,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,9 +22,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -49,12 +53,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -65,7 +71,6 @@ import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.KdeTopAppBar
 import org.kde.kdeconnect.ui.compose.components.DeviceDisconnectedOverlay
 import org.kde.kdeconnect_tp.R
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun RunCommandScreen(
@@ -113,15 +118,14 @@ fun RunCommandScreen(
             },
             floatingActionButton = {
                 if (plugin.canAddCommand() && isReachable) {
-                    FloatingActionButton(onClick = {
-                        plugin.sendSetupPacket()
-                        showDialog = true
-                    }) {
-                        Icon(
-                            painterResource(R.drawable.ic_action_image_edit_24dp),
-                            stringResource(R.string.add_command)
-                        )
-                    }
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            plugin.sendSetupPacket()
+                            showDialog = true
+                        },
+                        icon = { Icon(painterResource(R.drawable.ic_action_image_edit_24dp), stringResource(R.string.add_command)) },
+                        text = { Text(stringResource(R.string.add_command)) }
+                    )
                 }
             },
         ) {
@@ -152,11 +156,13 @@ fun RunCommandScreen(
                 )
             }
 
-            if (!commandList.isEmpty()) {
+            if (commandList.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier
                         .padding(it)
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 88.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     if (showOutputCard) {
                         item {
@@ -169,6 +175,8 @@ fun RunCommandScreen(
                         Box {
                             Row(
                                 modifier = Modifier
+                                    .clip(MaterialTheme.shapes.large)
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
                                     .pointerInput(command.key) {
                                         awaitEachGesture {
                                             val down = awaitFirstDown(
@@ -200,15 +208,16 @@ fun RunCommandScreen(
                                         text = command.name,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
-                                        style = MaterialTheme.typography.titleLarge,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        style = MaterialTheme.typography.titleMediumEmphasized,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                     )
                                     Text(
                                         text = command.command,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = Color.Gray,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontFamily = FontFamily.Monospace,
                                     )
                                 }
                             }
@@ -267,10 +276,11 @@ private fun OutputCard(
     }
 
     Card(
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
         modifier = Modifier
             .fillMaxWidth()
             .height(300.dp)
-            .padding(horizontal = 20.dp, vertical = 10.dp)
     ) {
         if (outputList.isNotEmpty()) {
             Box {
@@ -285,10 +295,11 @@ private fun OutputCard(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             text = text.string,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontFamily = FontFamily.Monospace,
                             fontWeight = if (text.isCommand) FontWeight.ExtraBold else FontWeight.Normal,
                             color = when (text.commandStatus) {
-                                RunCommandStatus.COMMAND_SUCCESSFUL -> Color(0xFF2E7D32)
+                                RunCommandStatus.COMMAND_SUCCESSFUL -> MaterialTheme.colorScheme.primary
                                 RunCommandStatus.COMMAND_FAILED -> MaterialTheme.colorScheme.error
                                 else -> Color.Unspecified
                             }

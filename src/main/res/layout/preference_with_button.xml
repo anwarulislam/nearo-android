@@ -21,7 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
+    android:background="@drawable/nearo_list_surface"
     >
     <RelativeLayout
         android:id="@+id/content"
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_gravity="center"
-        android:padding="16dp"
+        android:padding="20dp"
         android:minHeight="?android:attr/listPreferredItemHeight"
         >
         <TextView
@@ -38,8 +38,8 @@
             android:layout_height="wrap_content"
             android:ellipsize="marquee"
             android:fadingEdge="horizontal"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:singleLine="false"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
             tools:text="Plugin title"
             />
         <TextView
@@ -49,8 +49,8 @@
             android:layout_alignStart="@android:id/title"
             android:layout_below="@android:id/title"
             android:maxLines="3"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="Plugin description"
             />
     </RelativeLayout>
@@ -65,7 +65,7 @@
         android:layout_width="1dp"
         android:layout_height="32dp"
         android:layout_gravity="center"
-        android:background="?colorPrimary"
+        android:background="?attr/colorOutlineVariant"
         />
     <!-- Preference will place its actual preference widget here. -->
     <LinearLayout
@@ -74,7 +74,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
-        android:padding="16dp"
+        android:padding="20dp"
         android:orientation="vertical"
         />
 </LinearLayout>

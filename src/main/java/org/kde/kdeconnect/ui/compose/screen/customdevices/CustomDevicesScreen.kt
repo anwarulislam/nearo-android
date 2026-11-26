@@ -6,28 +6,28 @@
 
 package org.kde.kdeconnect.ui.compose.screen.customdevices
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -49,6 +49,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -58,6 +59,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import org.kde.kdeconnect.DeviceHost
 import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.KdeTopAppBar
+import org.kde.kdeconnect.ui.compose.components.DeviceIcon
 import org.kde.kdeconnect.ui.compose.components.KdeThemePreviews
 import org.kde.kdeconnect_tp.R
 
@@ -124,38 +126,37 @@ private fun CustomDevicesScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddClicked) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_device_dialog_title)
-                )
-            }
+            ExtendedFloatingActionButton(
+                onClick = onAddClicked,
+                icon = { Icon(Icons.Default.Add, stringResource(R.string.add_device_dialog_title)) },
+                text = { Text(stringResource(R.string.add_device_dialog_title)) }
+            )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            AnimatedVisibility(
-                visible = uiState.devices.isEmpty(),
-                enter = fadeIn(tween(300)),
-                exit = fadeOut(tween(150)),
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .align(Alignment.Center)
+        if (uiState.devices.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(innerPadding).verticalScroll(rememberScrollState())
+                    .padding(start = 28.dp, end = 28.dp, top = 16.dp, bottom = 88.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
             ) {
+                DeviceIcon(R.drawable.ic_device_desktop_32dp)
                 Text(
-                    text = stringResource(R.string.custom_device_list_help),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 24.dp)
+                    stringResource(R.string.custom_device_list_help),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
                 )
             }
-
+        } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = innerPadding
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+                contentPadding = PaddingValues(
+                    start = 16.dp, end = 16.dp, top = innerPadding.calculateTopPadding() + 8.dp,
+                    bottom = innerPadding.calculateBottomPadding() + 88.dp
+                )
             ) {
                 items(
                     items = uiState.devices,
@@ -166,7 +167,6 @@ private fun CustomDevicesScreen(
                         onClick = { onDeviceClicked(model.id) },
                         onDismissed = { onDeviceDismissed(model.id) }
                     )
-                    HorizontalDivider()
                 }
             }
         }
@@ -193,6 +193,7 @@ private fun CustomDeviceItem(
 
     SwipeToDismissBox(
         state = dismissState,
+        modifier = Modifier.clip(MaterialTheme.shapes.large),
         backgroundContent = {
             Box(
                 modifier = Modifier
@@ -213,29 +214,26 @@ private fun CustomDeviceItem(
         },
         onDismiss = { onDismissed() }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .clickable(onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer)
+                .clickable(onClick = onClick).padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = model.host.toString(),
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            val statusText = when (val ping = model.pingState) {
-                is PingState.InProgress -> stringResource(R.string.ping_in_progress)
-                is PingState.Success -> stringResource(R.string.ping_result, ping.latencyMs)
-                is PingState.Failed -> stringResource(R.string.ping_failed)
+            DeviceIcon(R.drawable.ic_device_desktop_32dp)
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(model.host.toString(), style = MaterialTheme.typography.titleMediumEmphasized)
+                val statusText = when (val ping = model.pingState) {
+                    is PingState.InProgress -> stringResource(R.string.ping_in_progress)
+                    is PingState.Success -> stringResource(R.string.ping_result, ping.latencyMs)
+                    is PingState.Failed -> stringResource(R.string.ping_failed)
+                }
+                Text(
+                    text = statusText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-            Text(
-                text = statusText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

@@ -9,15 +9,17 @@ package org.kde.kdeconnect.ui.compose
 import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.expressiveLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 
 @Composable
-fun KdeTheme(context : Context, content: @Composable () -> Unit) {
+fun KdeTheme(context: Context, content: @Composable () -> Unit) {
     val colorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         when (isSystemInDarkTheme()) {
             true -> dynamicDarkColorScheme(context)
@@ -26,11 +28,10 @@ fun KdeTheme(context : Context, content: @Composable () -> Unit) {
     } else {
         when (isSystemInDarkTheme()) {
             true -> darkColorScheme()
-            false -> lightColorScheme()
+            false -> expressiveLightColorScheme()
         }
     }
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content,
-    )
+    MaterialExpressiveTheme(colorScheme = colorScheme) {
+        CompositionLocalProvider(LocalContentColor provides colorScheme.onSurface, content = content)
+    }
 }

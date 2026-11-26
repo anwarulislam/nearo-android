@@ -7,6 +7,7 @@
 package org.kde.kdeconnect.ui.compose
 
 import android.annotation.SuppressLint
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ fun KdeTextField(modifier: Modifier = Modifier, input: MutableState<String>, lab
     var value by rememberSaveable { input }
     OutlinedTextField(
         modifier = modifier,
+        shape = MaterialTheme.shapes.large,
         value = value,
         onValueChange = { userInput -> value = userInput },
         label = { Text(label) },

@@ -10,14 +10,19 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -103,24 +108,20 @@ class ComposeSendActivity : AppCompatActivity() {
                     )
                 },
             ) { scaffoldPadding ->
-                Box(modifier = Modifier.padding(scaffoldPadding).fillMaxSize()) {
+                Column(
+                    modifier = Modifier.padding(scaffoldPadding).fillMaxSize().padding(16.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     KdeTextField(
-                        modifier = Modifier
-                            .focusRequester(focusRequester)
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 80.dp)
-                            .align(Alignment.BottomStart)
-                            .fillMaxWidth(),
+                        modifier = Modifier.focusRequester(focusRequester).fillMaxWidth().weight(1f),
                         input = userInput,
-                        label = stringResource(R.string.click_here_to_type),
+                        label = stringResource(R.string.click_here_to_type)
                     )
-                    KdeTextButton(
-                        onClick = { sendComposed() },
-                        modifier = Modifier.padding(all = 16.dp).align(Alignment.BottomEnd),
-                        enabled = userInput.value.isNotEmpty(),
-                        text = stringResource(R.string.send_compose),
-                        iconLeft = Icons.Default.Send,
-                    )
+                    Button(onClick = { sendComposed() }, enabled = userInput.value.isNotEmpty(), shapes = ButtonDefaults.shapes()) {
+                        Icon(Icons.Default.Send, null)
+                        Text(stringResource(R.string.send_compose), Modifier.padding(start = 8.dp))
+                    }
                 }
             }
         }

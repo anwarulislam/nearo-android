@@ -59,6 +59,12 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     <string name="pref_plugin_sharereceiver_desc">Share files and URLs between devices</string>
     <string name="pref_plugin_inputdevicesreceiver">Share input devices</string>
     <string name="pref_plugin_inputdevicesreceiver_desc">Share mouse and keyboard with the remote device</string>
+    <string name="settings_this_device">This device</string>
+    <string name="settings_connections">Connections</string>
+    <string name="settings_support">Support</string>
+    <string name="discover_devices">Nearby devices</string>
+    <string name="no_connected_devices">No connected devices</string>
+    <string name="device_actions">Device actions</string>
     <string name="device_list_empty">No devices</string>
     <string name="ok">OK</string>
     <string name="sad_ok">OK :(</string>
@@ -384,7 +390,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     <string name="block_notification_images">Block notification images</string>
 
     <string name="pairing_title">KDE Connect Devices</string>
-    <string name="pairing_description">Other devices running KDE Connect in your same network should appear here.</string>
+    <string name="pairing_description">Devices running KDE Connect on the same network appear here.</string>
     <string name="device_rename_title">Rename device</string>
     <string name="device_rename_confirm">Rename</string>
     <string name="refresh">Refresh</string>
@@ -406,11 +412,11 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     <string name="open">Open</string>
     <string name="close">Close</string>
 
-    <string name="plugins_need_permission">Some Plugins need permissions to work (tap for more info):</string>
+    <string name="plugins_need_permission">Permissions needed</string>
     <string name="permission_explanation">This plugin needs permissions to work</string>
     <string name="all_permissions_granted">All permissions granted 🎉</string>
     <string name="optional_permission_explanation">You need to grant extra permissions to enable all functions</string>
-    <string name="plugins_need_optional_permission">Some plugins have features disabled because of lack of permission (tap for more info):</string>
+    <string name="plugins_need_optional_permission">Optional permissions</string>
     <string name="share_optional_permission_explanation">To receive files you need to allow storage access</string>
     <string name="share_notifications_explanation">To see the progress when sending and receiving files you need to allow notifications</string>
     <string name="telepathy_permission_explanation">To read and write SMS from your desktop you need to give permission to SMS</string>

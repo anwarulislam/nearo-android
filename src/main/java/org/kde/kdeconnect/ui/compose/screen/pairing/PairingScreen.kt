@@ -8,45 +8,43 @@ package org.kde.kdeconnect.ui.compose.screen.pairing
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.kde.kdeconnect.extensions.safeDrawingBottomPadding
 import org.kde.kdeconnect.ui.compose.KdeTheme
-import org.kde.kdeconnect.ui.compose.components.KdeBodyLargeText
-import org.kde.kdeconnect.ui.compose.components.KdeBodyMediumText
-import org.kde.kdeconnect.ui.compose.components.KdeBodySmallText
-import org.kde.kdeconnect.ui.compose.components.KdeCard
+import org.kde.kdeconnect.ui.compose.components.DeviceIcon
+import org.kde.kdeconnect.ui.compose.components.DeviceListItem
 import org.kde.kdeconnect.ui.compose.components.KdeThemePreviews
 import org.kde.kdeconnect.ui.compose.components.SectionHeader
 import org.kde.kdeconnect.ui.compose.model.device.DeviceUiModel
@@ -59,264 +57,118 @@ fun PairingScreen(
     onWifiSettingsClick: () -> Unit = {},
     onNotificationSettingsClick: () -> Unit = {},
     onLocalNetworkPermissionClick: () -> Unit = {},
+    onAddByIpClick: () -> Unit = {},
     onRefresh: () -> Unit = {}
 ) {
-    val lazyListState = rememberLazyListState()
-    val pullRefreshState = rememberPullToRefreshState()
-
-    PairingScreenContent(
-        lazyListState = lazyListState,
-        pullRefreshState = pullRefreshState,
-        uiState = uiState,
-        onClick = onClick,
-        onWifiSettingsClick = onWifiSettingsClick,
-        onNotificationSettingsClick = onNotificationSettingsClick,
-        onLocalNetworkPermissionClick = onLocalNetworkPermissionClick,
-        onRefresh = onRefresh
-    )
-}
-
-@Composable
-private fun PairingScreenContent(
-    lazyListState: LazyListState,
-    pullRefreshState: PullToRefreshState,
-    uiState: PairingUiState,
-    onClick: (String) -> Unit,
-    onWifiSettingsClick: () -> Unit,
-    onNotificationSettingsClick: () -> Unit,
-    onLocalNetworkPermissionClick: () -> Unit,
-    onRefresh: () -> Unit = {}
-) {
-    PullToRefreshBox(
-        isRefreshing = uiState.isRefreshing,
-        onRefresh = onRefresh,
-        state = pullRefreshState
-    ) {
+    val hasPermissions = uiState.hasLocalNetworkPermission && uiState.hasNotificationsPermission
+    val hasNetwork = uiState.isWifiAvailable || uiState.available.isNotEmpty() || uiState.connected.isNotEmpty()
+    PullToRefreshBox(isRefreshing = uiState.isRefreshing, onRefresh = onRefresh, modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
-            contentPadding = safeDrawingBottomPadding(),
-            state = lazyListState
+            modifier = Modifier.align(Alignment.TopCenter).widthIn(max = 760.dp).fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = 16.dp, end = 16.dp, top = 8.dp,
+                bottom = safeDrawingBottomPadding().calculateBottomPadding() + 20.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
-            // Explanations
             item {
-                PairingExplanations(
-                    uiState = uiState,
-                    onWifiSettingsClick = onWifiSettingsClick,
-                    onNotificationSettingsClick = onNotificationSettingsClick,
-                    onLocalNetworkPermissionClick = onLocalNetworkPermissionClick
-                )
+                DiscoveryPanel(showDescription = hasPermissions && hasNetwork && uiState.isTrustedNetwork, onRefresh)
+            }
+            if (!uiState.hasLocalNetworkPermission) {
+                item { Notice(R.string.pairing_missing_local_network_permission, R.drawable.ic_warning, onLocalNetworkPermissionClick) }
+            }
+            if (!uiState.hasNotificationsPermission) {
+                item { Notice(R.string.no_notifications, R.drawable.ic_warning, onNotificationSettingsClick) }
+            }
+            if (hasPermissions) {
+                if (uiState.hasDuplicateNames) item { Notice(R.string.pairing_duplicate_names, R.drawable.ic_warning) }
+                if (!hasNetwork) {
+                    item { Notice(R.string.no_wifi, R.drawable.ic_wifi, onWifiSettingsClick) }
+                } else if (!uiState.isTrustedNetwork) {
+                    item { Notice(R.string.on_non_trusted_message, R.drawable.ic_warning) }
+                }
             }
 
-            // Connected devices
-            item {
-                SectionHeader(title = stringResource(id = R.string.category_connected_devices))
-            }
+            deviceGroup(R.string.category_connected_devices, uiState.connected, onClick)
             if (uiState.connected.isEmpty()) {
                 item {
-                    EmptyPlaceholder()
-                }
-            } else {
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-                itemsIndexed(
-                    items = uiState.connected,
-                    key = { _, connectedDevice -> connectedDevice.id }) { _, connectedDevice ->
-                    CardContent(
-                        device = connectedDevice,
-                        onClick = onClick
-                    )
+                    Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerLow) {
+                        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                                DeviceIcon(R.drawable.ic_phonelink_36dp)
+                                Text(stringResource(R.string.no_connected_devices), style = MaterialTheme.typography.titleMedium)
+                            }
+                            if (uiState.available.isEmpty()) {
+                                TextButton(onClick = onAddByIpClick) { Text(stringResource(R.string.custom_device_list)) }
+                            }
+                        }
+                    }
                 }
             }
+            if (uiState.available.isNotEmpty()) deviceGroup(R.string.category_not_paired_devices, uiState.available, onClick)
+            if (uiState.remembered.isNotEmpty()) deviceGroup(R.string.category_remembered_devices, uiState.remembered, onClick)
+        }
+    }
+}
 
-            // Available devices
-            if (uiState.available.isNotEmpty()) {
-                item {
-                    SectionHeader(title = stringResource(id = R.string.category_not_paired_devices))
-                }
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-                itemsIndexed(
-                    items = uiState.available,
-                    key = { _, availableDevice -> availableDevice.id }) { _, availableDevice ->
-                    CardContent(
-                        device = availableDevice,
-                        onClick = onClick
-                    )
-                }
-            }
-
-            // Remembered devices
-            if (uiState.remembered.isNotEmpty()) {
-                item {
-                    SectionHeader(title = stringResource(id = R.string.category_remembered_devices))
-                }
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-                itemsIndexed(
-                    items = uiState.remembered,
-                    key = { _, rememberedDevice -> rememberedDevice.id }) { _, rememberedDevice ->
-                    CardContent(
-                        device = rememberedDevice,
-                        onClick = onClick
-                    )
-                }
-            }
+private fun LazyListScope.deviceGroup(title: Int, devices: List<DeviceUiModel>, onClick: (String) -> Unit) {
+    item { SectionHeader(stringResource(title), devices.size) }
+    itemsIndexed(devices, key = { _, device -> device.id }) { index, device ->
+        DeviceListItem(device, index, devices.size, device.summaryRes.takeIf { it > 0 }?.let { stringResource(it) }) {
+            onClick(device.id)
         }
     }
 }
 
 @Composable
-private fun PairingExplanations(
-    uiState: PairingUiState,
-    onWifiSettingsClick: () -> Unit,
-    onNotificationSettingsClick: () -> Unit,
-    onLocalNetworkPermissionClick: () -> Unit
-) {
-    Column {
-        if (!uiState.hasLocalNetworkPermission) {
-            PairingExplanationRow(
-                text = stringResource(id = R.string.pairing_missing_local_network_permission),
-                icon = R.drawable.ic_warning,
-                onClick = onLocalNetworkPermissionClick
-            )
-        }
-
-        if (!uiState.hasNotificationsPermission) {
-            PairingExplanationRow(
-                text = stringResource(R.string.no_notifications),
-                icon = R.drawable.ic_warning,
-                onClick = onNotificationSettingsClick
-            )
-        }
-
-        if (!uiState.hasLocalNetworkPermission || !uiState.hasNotificationsPermission) {
-            return
-        }
-
-        if (uiState.hasDuplicateNames) {
-            DuplicateNamesWarning()
-        }
-
-        val someDevicesReachable = uiState.available.isNotEmpty() || uiState.connected.isNotEmpty()
-
-        if (someDevicesReachable || uiState.isWifiAvailable) {
-            if (uiState.isTrustedNetwork) {
-                PairingExplanationRow(text = stringResource(R.string.pairing_description))
-            } else {
-                PairingExplanationRow(
-                    text = stringResource(R.string.on_non_trusted_message),
-                    icon = R.drawable.ic_warning
+private fun DiscoveryPanel(showDescription: Boolean, onRefresh: () -> Unit) {
+    Surface(
+        shape = MaterialTheme.shapes.extraLarge,
+        color = colorResource(R.color.nearo_ink),
+        contentColor = colorResource(R.color.nearo_on_ink)
+    ) {
+        Column(Modifier.fillMaxWidth().padding(22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(R.string.discover_devices),
+                    modifier = Modifier.weight(1f).semantics { heading() },
+                    style = MaterialTheme.typography.headlineLargeEmphasized
+                )
+                Image(
+                    painterResource(R.drawable.nearo_discovery_art), contentDescription = null,
+                    modifier = Modifier.weight(1.08f).height(104.dp)
                 )
             }
-        } else {
-            PairingExplanationRow(
-                text = stringResource(R.string.no_wifi),
-                icon = R.drawable.ic_wifi,
-                onClick = onWifiSettingsClick
-            )
-        }
-    }
-}
-
-@Composable
-fun PairingExplanationRow(
-    text: String,
-    icon: Int? = null,
-    onClick: (() -> Unit)? = null
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (icon != null) {
-            Image(
-                painter = painterResource(id = icon),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurfaceVariant)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-        }
-        KdeBodyMediumText(
-            text = text,
-            onClick = { onClick?.invoke() }
-        )
-    }
-}
-
-@Composable
-fun DuplicateNamesWarning() {
-    PairingExplanationRow(
-        text = stringResource(id = R.string.pairing_duplicate_names),
-        icon = R.drawable.ic_warning,
-    )
-}
-
-@Composable
-fun EmptyPlaceholder() {
-    KdeBodySmallText(
-        text = stringResource(R.string.device_list_empty),
-        modifier = Modifier.padding(10.dp),
-        textAlign = TextAlign.Center,
-    )
-}
-
-@Composable
-private fun CardContent(
-    device: DeviceUiModel,
-    onClick: (String) -> Unit
-) {
-    KdeCard(
-        modifier = Modifier.fillMaxWidth(),
-        content = {
-            PairingScreenCardContent(device = device)
-        },
-        onClick = { onClick(device.id) }
-    )
-}
-
-@Composable
-private fun PairingScreenCardContent(device: DeviceUiModel) {
-    Row(
-        modifier = Modifier
-            .wrapContentSize()
-            .defaultMinSize(minHeight = 48.dp)
-            .padding(all = 32.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (device.icon > 0) {
-            Image(
-                imageVector = ImageVector.vectorResource(id = device.icon),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurfaceVariant),
-                modifier = Modifier
-                    .padding(start = 12.dp)
-                    .size(32.dp)
-                    .wrapContentHeight()
-            )
-        }
-        Column(
-            modifier = Modifier.padding(start = 8.dp)
-        ) {
-            KdeBodyLargeText(
-                text = device.name,
-                fontSize = 18.sp,
-            )
-            if (device.summaryRes > 0) {
-                KdeBodySmallText(
-                    text = stringResource(id = device.summaryRes),
-                    color = Color(0xFFCC2222),
-                    fontSize = 14.sp,
-                    maxLines = 1,
-                )
+            if (showDescription) {
+                Text(stringResource(R.string.pairing_description), style = MaterialTheme.typography.bodyLarge)
             }
+            Button(
+                onClick = onRefresh,
+                shapes = ButtonDefaults.shapes(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.nearo_lime),
+                    contentColor = colorResource(R.color.nearo_ink)
+                )
+            ) {
+                Icon(painterResource(R.drawable.ic_action_refresh_24dp), null, Modifier.size(20.dp))
+                Text(stringResource(R.string.refresh), Modifier.padding(start = 8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun Notice(text: Int, icon: Int, onClick: (() -> Unit)? = null) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.tertiaryContainer
+    ) {
+        val action = if (onClick == null) Modifier else Modifier.clickable(role = Role.Button, onClick = onClick)
+        Row(action.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(painterResource(icon), null, Modifier.size(24.dp))
+            Text(stringResource(text), Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+            if (onClick != null) Icon(painterResource(R.drawable.ic_arrow_forward_black_24dp), null, Modifier.size(18.dp))
         }
     }
 }
@@ -325,12 +177,7 @@ private fun PairingScreenCardContent(device: DeviceUiModel) {
 @Composable
 private fun PreviewCompose() {
     KdeTheme(context = LocalContext.current) {
-        val lazyListState = rememberLazyListState()
-        val pullRefreshState = rememberPullToRefreshState()
-
-        PairingScreenContent(
-            lazyListState = lazyListState,
-            pullRefreshState = pullRefreshState,
+        PairingScreen(
             uiState = PairingUiState(
                 isWifiAvailable = true,
                 hasNotificationsPermission = true,

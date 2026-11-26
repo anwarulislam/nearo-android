@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -103,11 +103,11 @@ private fun Header() {
             painter = painterResource(id = R.drawable.ic_kde_48dp),
             contentDescription = null,
             modifier = Modifier.size(48.dp),
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground)
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
         )
         Text(
             text = stringResource(id = R.string.kde_be_free),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.headlineMediumEmphasized
         )
     }
 }
@@ -120,7 +120,8 @@ private fun HtmlCard(htmlContent: String) {
             .replace("</h1>", "</h1><br>")
     }
 
-    ElevatedCard(
+    Card(
+        shape = MaterialTheme.shapes.large,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
@@ -135,7 +136,7 @@ private fun HtmlCard(htmlContent: String) {
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(20.dp),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )

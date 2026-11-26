@@ -89,7 +89,7 @@ class PairingFragment : BaseFragment<DevicesListBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setActionBarText(getString(R.string.pairing_title))
+        setActionBarText(getString(R.string.nearo_app_name))
 
         activity?.addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
@@ -151,6 +151,7 @@ class PairingFragment : BaseFragment<DevicesListBinding>() {
                                 localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
                             }
                         },
+                        onAddByIpClick = { startActivity(Intent(requireContext(), CustomDevicesActivity::class.java)) },
                         onRefresh = { viewModel.onRefresh() }
                     )
                 }

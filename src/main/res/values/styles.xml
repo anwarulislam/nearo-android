@@ -6,9 +6,9 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- NoActionBar because we use a Toolbar widget as ActionBar -->
-    <style name="KdeConnectThemeBase" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
-        <!-- The main color attributes -->
-        <!-- Drawable definitions and overrides -->
+    <style name="KdeConnectThemeBase" parent="Theme.Material3Expressive.DynamicColors.DayNight.NoActionBar">
+        <item name="android:windowBackground">?attr/colorSurface</item>
+        <item name="toolbarStyle">@style/KdeConnectTheme.Toolbar</item>
 
         <item name="materialCardViewStyle">@style/KdeConnectCardStyle</item>
 
@@ -35,29 +35,36 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
     </style>
 
-    <style name="KdeConnectTheme.Toolbar" parent="Widget.AppCompat.Toolbar">
+    <style name="KdeConnectTheme.Toolbar" parent="Widget.Material3Expressive.Toolbar">
+        <item name="titleTextAppearance">?attr/textAppearanceTitleLarge</item>
+        <item name="subtitleTextAppearance">?attr/textAppearanceLabelLarge</item>
     </style>
 
-    <style name="KdeConnectDialogStyle" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <style name="KdeConnectDialogStyle" parent="ThemeOverlay.Material3Expressive.MaterialAlertDialog">
         <item name="android:layout" tools:ignore="PrivateResource">@layout/m3_alert_dialog</item>
         <item name="dialogCornerRadius" tools:ignore="PrivateResource">@dimen/m3_alert_dialog_corner_size</item>
     </style>
 
-    <style name="KdeConnectCardStyle" parent="@style/Widget.Material3.CardView.Elevated"/>
-
-    <style name="KdeConnectCardStyle.Filled" parent="@style/Widget.Material3.CardView.Filled"/>
-
-    <style name="MainNavigationView">
+    <style name="KdeConnectCardStyle" parent="Widget.Material3.CardView.Filled">
+        <item name="cardCornerRadius">24dp</item>
     </style>
 
-    <style name="KdeConnectButton.IconButton" parent="Widget.Material3.Button.IconButton.Filled">
+    <style name="KdeConnectCardStyle.Filled" parent="KdeConnectCardStyle"/>
+
+    <style name="MainNavigationView" parent="Widget.Material3.NavigationView">
+        <item name="android:background">?attr/colorSurfaceContainerLow</item>
+        <item name="itemVerticalPadding">6dp</item>
+        <item name="itemTextAppearance">?attr/textAppearanceTitleSmall</item>
+    </style>
+
+    <style name="KdeConnectButton.IconButton" parent="Widget.Material3Expressive.Button.IconButton.Filled">
         <item name="iconGravity">textStart</item>
         <item name="cornerRadius">24dp</item>
     </style>
 
-    <style name="KdeConnectButton.IconButton.Secondary" parent="Widget.Material3.Button.IconButton.Filled.Tonal">
+    <style name="KdeConnectButton.IconButton.Secondary" parent="Widget.Material3Expressive.Button.IconButton.Tonal">
         <item name="iconGravity">textStart</item>
-        <item name="cornerRadius">12dp</item>
+        <item name="cornerRadius">18dp</item>
     </style>
 
     <style name="ActionModeStyle" parent="Widget.AppCompat.ActionMode">
@@ -85,7 +92,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         <item name="android:gravity">center</item>
         <item name="android:textSize">12sp</item>
     </style>
-    <style name="RemoteInputClickButton" parent="Widget.Material3.Button.TonalButton">
+    <style name="RemoteInputClickButton" parent="Widget.Material3Expressive.Button.TonalButton">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">48dp</item>
         <item name="android:minWidth">0dp</item>
@@ -93,7 +100,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         <item name="android:layout_marginRight">2dp</item>
         <item name="android:paddingLeft">4dp</item>
         <item name="android:paddingRight">4dp</item>
-        <item name="cornerRadius">12dp</item>
+        <item name="cornerRadius">18dp</item>
     </style>
 
     <style name="RemoteInputSpaceButton" parent="RemoteInputClickButton">

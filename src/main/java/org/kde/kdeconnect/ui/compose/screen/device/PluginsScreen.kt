@@ -6,35 +6,40 @@
 
 package org.kde.kdeconnect.ui.compose.screen.device
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.kde.kdeconnect.extensions.safeDrawingBottomPadding
 import org.kde.kdeconnect.plugins.Plugin
 import org.kde.kdeconnect.plugins.clipboard.ClipboardPlugin
@@ -43,7 +48,9 @@ import org.kde.kdeconnect.plugins.ping.PingPlugin
 import org.kde.kdeconnect.plugins.presenter.PresenterPlugin
 import org.kde.kdeconnect.plugins.runcommand.RunCommandPlugin
 import org.kde.kdeconnect.ui.compose.KdeTheme
+import org.kde.kdeconnect.ui.compose.components.DeviceIcon
 import org.kde.kdeconnect.ui.compose.components.KdeThemePreviews
+import org.kde.kdeconnect.ui.compose.components.SectionHeader
 import org.kde.kdeconnect_tp.R
 
 @Composable
@@ -81,15 +88,16 @@ private fun PluginsScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(state = rememberScrollState())
-                .padding(top = 16.dp, bottom = bottomPadding)
+                .padding(bottom = bottomPadding + 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val numColumns = LocalResources.current.getInteger(R.integer.plugins_columns)
-
-            PluginButtons(
-                buttons = pluginsWithButtons,
-                numColumns = numColumns,
-                onButtonClick = onButtonClick
-            )
+            val numColumns = if (LocalDensity.current.fontScale > 1.5f) 1 else LocalResources.current.getInteger(R.integer.plugins_columns)
+            if (pluginsWithButtons.isNotEmpty()) {
+                Column(Modifier.widthIn(max = 840.dp).padding(horizontal = 16.dp)) {
+                    SectionHeader(stringResource(R.string.device_actions))
+                    PluginButtons(pluginsWithButtons, numColumns, onButtonClick)
+                }
+            }
             Spacer(modifier = Modifier.padding(vertical = 6.dp))
             if (pluginsNeedPermissions.isNotEmpty()) {
                 PluginsWithoutPermissions(
@@ -116,62 +124,27 @@ private fun PluginButtons(
     numColumns: Int,
     onButtonClick: (Plugin.PluginUiButton) -> Unit
 ) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        val buttonIter = buttons.iterator()
-
-        while (buttonIter.hasNext()) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        buttons.chunked(numColumns).forEach { row ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                repeat(times = numColumns) {
-                    if (buttonIter.hasNext()) {
-                        val button = buttonIter.next()
-
-                        PluginButton(
-                            button = button,
-                            modifier = Modifier.weight(1f),
-                            onClick = { onButtonClick(button) }
-                        )
-                    } else {
-                        Spacer(modifier = Modifier.weight(1f))
+                row.forEach { button ->
+                    Card(
+                        modifier = Modifier.weight(1f).fillMaxHeight().semantics { role = Role.Button },
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                        onClick = { onButtonClick(button) }
+                    ) {
+                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                            DeviceIcon(button.iconRes)
+                            Text(button.name, style = MaterialTheme.typography.titleMediumEmphasized)
+                        }
                     }
                 }
+                repeat(numColumns - row.size) { Spacer(Modifier.weight(1f)) }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PluginButton(
-    button: Plugin.PluginUiButton,
-    modifier: Modifier,
-    onClick: () -> Unit
-) {
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        modifier = modifier.semantics { role = Role.Button },
-        onClick = onClick
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = button.iconRes),
-                modifier = Modifier.padding(top = 12.dp),
-                contentDescription = null
-            )
-            Text(
-                text = button.name,
-                maxLines = 2,
-                minLines = 2,
-                fontSize = 18.sp,
-                overflow = TextOverflow.Ellipsis
-            )
         }
     }
 }
@@ -182,21 +155,19 @@ private fun PluginsWithoutPermissions(
     plugins: Collection<Plugin>,
     action: (plugin: Plugin) -> Unit
 ) {
-    Text(
-        text = title,
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .semantics { heading() }
-    )
-    plugins.forEach { plugin ->
-        Text(
-            text = plugin.displayName,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { action(plugin) }
-                .padding(start = 28.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-                .semantics { role = Role.Button }
-        )
+    Column(
+        modifier = Modifier.widthIn(max = 840.dp).fillMaxWidth().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
+    ) {
+        SectionHeader(title)
+        plugins.forEachIndexed { index, plugin ->
+            SegmentedListItem(
+                onClick = { action(plugin) },
+                shapes = ListItemDefaults.segmentedShapes(index, plugins.size),
+                colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                trailingContent = { Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null) }
+            ) { Text(plugin.displayName) }
+        }
     }
 }
 

@@ -20,7 +20,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         android:drawablePadding="4dp"
         android:paddingLeft="16dip"
         android:paddingRight="16dip"
-        android:textSize="16sp"
+        android:textAppearance="?attr/textAppearanceTitleLarge"
         tools:text="Header" />
 
     <TextView
@@ -30,7 +30,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         android:layout_gravity="center"
         android:layout_margin="10dip"
         android:text="@string/device_list_empty"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
         android:visibility="gone" />
 
 </LinearLayout>

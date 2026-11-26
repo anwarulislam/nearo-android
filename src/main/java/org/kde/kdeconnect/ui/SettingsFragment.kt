@@ -9,8 +9,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -28,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -59,22 +58,40 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val context = preferenceManager.context
         val screen = preferenceManager.createPreferenceScreen(context)
 
-        listOf(
-            deviceNamePref(context),
-            themePref(context),
-            persistentNotificationPref(context),
-            trustedNetworkPref(context),
-            devicesByIpPref(context),
-            bluetoothSupportPref(context),
-            exportLogsPref(context),
-            moreSettingsPref(context),
-        ).forEach(screen::addPreference)
+        fun section(title: Int, vararg entries: Pair<Preference, Int>) {
+            val group = PreferenceCategory(context).apply {
+                setTitle(title)
+                isIconSpaceReserved = false
+            }
+            screen.addPreference(group)
+            for ((preference, icon) in entries) {
+                preference.layoutResource = R.layout.nearo_preference
+                preference.setIcon(icon)
+                group.addPreference(preference)
+            }
+        }
+
+        section(R.string.settings_this_device,
+            deviceNamePref(context) to R.drawable.ic_device_phone_32dp,
+            themePref(context) to R.drawable.ic_settings_24dp,
+            persistentNotificationPref(context) to R.drawable.ic_baseline_info_24
+        )
+        section(R.string.settings_connections,
+            trustedNetworkPref(context) to R.drawable.ic_wifi,
+            devicesByIpPref(context) to R.drawable.ic_device_desktop_32dp,
+            bluetoothSupportPref(context) to R.drawable.ic_phonelink_36dp
+        )
+        section(R.string.settings_support,
+            exportLogsPref(context) to R.drawable.ic_baseline_code_24,
+            moreSettingsPref(context) to R.drawable.ic_settings_24dp
+        )
 
         preferenceScreen = screen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setDivider(null)
         listView.setupBottomPadding()
     }
 
@@ -107,13 +124,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val name = new as String?
             if (name.isNullOrBlank()) {
                 if (view != null) {
-                    val snackbar = Snackbar.make(requireView(), R.string.invalid_device_name, Snackbar.LENGTH_LONG)
-                    val currentTheme = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-                    if (currentTheme != Configuration.UI_MODE_NIGHT_YES) {
-                        // white color is set to the background of snackbar if dark mode is off
-                        snackbar.view.setBackgroundColor(Color.WHITE)
-                    }
-                    snackbar.show()
+                    Snackbar.make(requireView(), R.string.invalid_device_name, Snackbar.LENGTH_LONG).show()
                 }
                 false
             }

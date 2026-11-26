@@ -10,12 +10,9 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import org.kde.kdeconnect.ui.compose.KdeTheme
+import org.kde.kdeconnect.ui.compose.KdeTopAppBar
 import org.kde.kdeconnect.ui.compose.screen.licenses.LicensesEvent
 import org.kde.kdeconnect.ui.compose.screen.licenses.LicensesScreen
 import org.kde.kdeconnect_tp.R
@@ -68,23 +66,15 @@ class LicensesActivity : AppCompatActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LicensesTopBar(
     onNavigateBack: () -> Unit,
     onScrollToTop: () -> Unit,
     onScrollToBottom: () -> Unit
 ) {
-    TopAppBar(
-        title = { Text(stringResource(R.string.licenses)) },
-        navigationIcon = {
-            IconButton(onClick = onNavigateBack) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_back_black_24dp),
-                    contentDescription = "Back"
-                )
-            }
-        },
+    KdeTopAppBar(
+        title = stringResource(R.string.licenses),
+        navIconOnClick = onNavigateBack,
         actions = {
             IconButton(onClick = onScrollToTop) {
                 Icon(

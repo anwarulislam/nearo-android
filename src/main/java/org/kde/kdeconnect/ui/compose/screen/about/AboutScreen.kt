@@ -14,7 +14,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -26,15 +25,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -54,6 +54,7 @@ import org.kde.kdeconnect.ui.about.AboutData
 import org.kde.kdeconnect.ui.about.AboutPerson
 import org.kde.kdeconnect.ui.about.applicationAboutData
 import org.kde.kdeconnect.ui.compose.KdeTheme
+import org.kde.kdeconnect.ui.compose.components.DeviceIcon
 import org.kde.kdeconnect.ui.compose.components.KdeThemePreviews
 import org.kde.kdeconnect_tp.R
 
@@ -114,8 +115,10 @@ private fun AppInfoCard(
     var firstTapMillis by remember { mutableStateOf<Long?>(null) }
     val context = LocalContext.current
 
-    ElevatedCard(
+    Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         onClick = {
             val clipboard = context.getSystemService<ClipboardManager>()!!
             clipboard.setPrimaryClip(ClipData.newPlainText("Version", aboutData.versionName))
@@ -144,7 +147,8 @@ private fun AppInfoCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment = Alignment.Top
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = aboutData.icon),
@@ -157,12 +161,12 @@ private fun AppInfoCard(
             ) {
                 Text(
                     text = stringResource(aboutData.name),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.headlineSmallEmphasized
                 )
                 Text(
                     text = stringResource(id = R.string.version, aboutData.versionName),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }
@@ -259,33 +263,18 @@ private fun ActionIconTextButton(
     @DrawableRes iconRes: Int,
     onClick: () -> Unit
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-
     Column(
-        modifier = Modifier
-            .size(84.dp)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    bounded = false
-                ),
-                onClick = onClick
-            ),
+        modifier = Modifier.widthIn(max = 100.dp).heightIn(min = 92.dp)
+            .clickable(onClick = onClick).padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            painter = painterResource(id = iconRes),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.size(24.dp)
-        )
+        DeviceIcon(iconRes)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(id = textRes),
             style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
     }
@@ -293,7 +282,7 @@ private fun ActionIconTextButton(
 
 @Composable
 private fun AuthorsCard(aboutData: AboutData) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -301,7 +290,7 @@ private fun AuthorsCard(aboutData: AboutData) {
         ) {
             Text(
                 text = stringResource(id = R.string.authors),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLargeEmphasized
             )
             Spacer(modifier = Modifier.height(16.dp))
 

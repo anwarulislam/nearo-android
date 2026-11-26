@@ -12,10 +12,10 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     android:id="@+id/sink_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="24dp"
     app:cardElevation="0dp"
-    app:contentPadding="8dp"
-    app:strokeWidth="1dp">
+    app:contentPadding="12dp"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:ellipsize="end"
             android:maxLines="1"
             android:paddingStart="14dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
             tools:text="Device name" />
 
         <LinearLayout
@@ -44,9 +44,10 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
 
             <ImageButton
                 android:id="@+id/systemvolume_mute"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@android:color/transparent"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/mute"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_volume"/>

@@ -6,16 +6,22 @@
 
 package org.kde.kdeconnect.ui.compose.screen.device
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,9 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.kde.kdeconnect.PairingHandler
 import org.kde.kdeconnect.ui.compose.KdeTheme
-import org.kde.kdeconnect.ui.compose.components.KdeBodyMediumText
+import org.kde.kdeconnect.ui.compose.components.DeviceIcon
 import org.kde.kdeconnect.ui.compose.components.KdeThemePreviews
-import org.kde.kdeconnect.ui.compose.components.KdeTitleMediumText
 import org.kde.kdeconnect_tp.R
 
 @Composable
@@ -50,6 +55,7 @@ fun DevicePairingScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun DevicePairingScreenContent(
     pairStatus: PairingHandler.PairState,
@@ -60,75 +66,47 @@ private fun DevicePairingScreenContent(
     onRejectPairing: () -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(all = 16.dp)
+        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val finalPairMessage = pairMessage ?: when (pairStatus) {
-            PairingHandler.PairState.NotPaired -> stringResource(id = R.string.device_not_paired)
-            else -> stringResource(id = R.string.pair_requested)
-        }
-
-        KdeTitleMediumText(
-            text = finalPairMessage,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        KdeBodyMediumText(
-            text = stringResource(id = R.string.pairing_explanation),
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
-        if (pairStatus != PairingHandler.PairState.NotPaired) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_key),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 5.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+        Surface(
+            modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth(),
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surfaceContainerLow
+        ) {
+            Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                DeviceIcon(R.drawable.ic_phonelink_36dp)
+                val message = pairMessage ?: stringResource(
+                    if (pairStatus == PairingHandler.PairState.NotPaired) R.string.device_not_paired else R.string.pair_requested
                 )
-                KdeTitleMediumText(text = verificationKey)
-            }
-        }
-
-        if (pairStatus == PairingHandler.PairState.Requested) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
-        }
-
-        if (pairStatus == PairingHandler.PairState.NotPaired) {
-            Button(
-                onClick = onRequestPairing,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.request_pairing))
-            }
-        }
-
-        if (pairStatus == PairingHandler.PairState.RequestedByPeer) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            ) {
-                Button(
-                    onClick = onAcceptPairing,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = stringResource(id = R.string.pairing_accept))
+                Text(message, style = MaterialTheme.typography.headlineMediumEmphasized)
+                Text(stringResource(R.string.pairing_explanation), style = MaterialTheme.typography.bodyLarge)
+                if (pairStatus != PairingHandler.PairState.NotPaired) {
+                    Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.secondaryContainer) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(painterResource(R.drawable.ic_key), null)
+                            Text(verificationKey, style = MaterialTheme.typography.headlineSmallEmphasized)
+                        }
+                    }
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = onRejectPairing,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = stringResource(id = R.string.pairing_reject))
+                when (pairStatus) {
+                    PairingHandler.PairState.NotPaired -> Button(
+                        onClick = onRequestPairing, shapes = ButtonDefaults.shapes(), modifier = Modifier.fillMaxWidth()
+                    ) { Text(stringResource(R.string.request_pairing)) }
+                    PairingHandler.PairState.Requested -> LoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    PairingHandler.PairState.RequestedByPeer -> Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = onAcceptPairing, modifier = Modifier.weight(1f), shapes = ButtonDefaults.shapes()) {
+                            Text(stringResource(R.string.pairing_accept))
+                        }
+                        FilledTonalButton(onClick = onRejectPairing, modifier = Modifier.weight(1f), shapes = ButtonDefaults.shapes()) {
+                            Text(stringResource(R.string.pairing_reject))
+                        }
+                    }
+                    else -> Unit
                 }
             }
         }

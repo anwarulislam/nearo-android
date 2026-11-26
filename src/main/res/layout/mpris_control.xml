@@ -9,6 +9,8 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mpris_control_view"
+    android:background="@drawable/nearo_control_surface"
+    android:padding="10dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -21,7 +23,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/no_players_connected"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?attr/textAppearanceLabelLarge" />
 
     <Spinner
         android:id="@+id/player_spinner"
@@ -40,7 +42,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         android:padding="8dip"
         android:scrollHorizontally="true"
         android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?attr/textAppearanceTitleMedium" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -58,7 +60,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:clickable="false"
             android:contentDescription="@string/mpris_loop"
             app:icon="@drawable/ic_loop_none_black"
-            style="@style/KdeConnectButton.IconButton"
+            style="@style/KdeConnectButton.IconButton.Secondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.20" />
@@ -73,6 +75,8 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:clickable="false"
             android:contentDescription="@string/mpris_play"
             app:icon="@drawable/ic_play_black"
+            app:iconSize="36dp"
+            android:layout_marginHorizontal="4dp"
             style="@style/KdeConnectButton.IconButton"
             app:layout_constraintEnd_toStartOf="@id/shuffle_button"
             app:layout_constraintStart_toEndOf="@id/loop_button"
@@ -88,7 +92,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:clickable="false"
             android:contentDescription="@string/mpris_shuffle"
             app:icon="@drawable/ic_shuffle_off_black"
-            style="@style/KdeConnectButton.IconButton"
+            style="@style/KdeConnectButton.IconButton.Secondary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintWidth_percent="0.20" />
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -161,7 +165,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:padding="8dip"
             android:singleLine="true"
             android:text="00:00"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?attr/textAppearanceLabelLarge" />
 
         <SeekBar
             android:id="@+id/positionSeek"
@@ -179,7 +183,7 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:padding="8dip"
             android:singleLine="true"
             android:text="00:00"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?attr/textAppearanceLabelLarge" />
     </LinearLayout>
 
     <LinearLayout
