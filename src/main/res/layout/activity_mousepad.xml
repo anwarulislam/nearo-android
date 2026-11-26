@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+SPDX-FileCopyrightText: 2014 Ahmed I. Khalil <ahmedibrahimkhali@gmail.com>
+
+SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+-->
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="org.kde.kdeconnect.plugins.mousepad.MousePadActivity">
+
+    <include layout="@layout/toolbar" android:id="@+id/toolbar_layout" />
+
+    <LinearLayout
+        android:id="@+id/mousepad_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:keepScreenOn="true"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:splitMotionEvents="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layoutDirection="ltr"
+            android:splitMotionEvents="false">
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/remote_pad_surface"
+                android:clipToOutline="true">
+
+                <org.kde.kdeconnect.plugins.mousepad.KeyListenerView
+                    android:id="@+id/keyListener"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/remote_pad_texture"
+                    android:focusedByDefault="true"
+                    android:contentDescription="@string/mousepad_info_no_gestures" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="?attr/colorSurfaceContainer"
+                    android:padding="8dp"
+                    android:gravity="center"
+                    android:drawablePadding="4dp"
+                    android:importantForAccessibility="no"
+                    android:text="@string/remote_trackpad"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    app:drawableTopCompat="@drawable/touchpad_plugin_action_24dp"
+                    app:drawableTint="?attr/colorOnSurfaceVariant" />
+            </FrameLayout>
+
+            <org.kde.kdeconnect.plugins.mousepad.RemoteScrollRail
+                android:id="@+id/scroll_rail"
+                android:layout_width="52dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="6dp"
+                android:background="@drawable/remote_scroll_surface"
+                android:gravity="bottom|center_horizontal"
+                android:paddingBottom="8dp"
+                android:focusable="true"
+                android:text="@string/remote_scroll"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                android:contentDescription="@string/remote_scroll_description" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/spaces_heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="6dp"
+            android:paddingStart="4dp"
+            android:text="@string/remote_mac_spaces"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <LinearLayout
+            android:id="@+id/spaces_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layoutDirection="ltr">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/space_previous"
+                style="@style/RemoteInputSpaceButton"
+                android:text="@string/remote_previous"
+                android:contentDescription="@string/remote_previous_description"
+                app:icon="@drawable/ic_arrow_back_black_24dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/space_overview"
+                style="@style/RemoteInputSpaceButton"
+                android:text="@string/remote_overview"
+                android:contentDescription="@string/remote_overview_description"
+                app:icon="@drawable/ic_device_desktop_32dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/space_next"
+                style="@style/RemoteInputSpaceButton"
+                android:text="@string/remote_next"
+                android:contentDescription="@string/remote_next_description"
+                app:icon="@drawable/ic_arrow_forward_black_24dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/mouse_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mouse_click_left"
+                style="@style/RemoteInputClickButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/left_click"
+                android:text="@string/remote_click_left" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mouse_click_middle"
+                style="@style/RemoteInputClickButton"
+                android:layout_width="48dp"
+                android:layout_weight="0"
+                android:contentDescription="@string/middle_click"
+                app:icon="@drawable/remote_mouse"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mouse_click_right"
+                style="@style/RemoteInputClickButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/right_click"
+                android:text="@string/remote_click_right" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/shortcut_keys"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/command_key"
+                style="@style/RemoteShortcutButton"
+                android:contentDescription="@string/remote_key_command_description"
+                android:text="@string/remote_key_command" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/control_key"
+                style="@style/RemoteShortcutButton"
+                android:contentDescription="@string/remote_key_control_description"
+                android:text="@string/remote_key_control" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/option_key"
+                style="@style/RemoteShortcutButton"
+                android:contentDescription="@string/remote_key_option_description"
+                android:text="@string/remote_key_option" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/shift_key"
+                style="@style/RemoteShortcutButton"
+                android:contentDescription="@string/remote_key_shift_description"
+                android:text="@string/remote_key_shift" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/escape_key"
+                style="@style/RemoteShortcutButton"
+                android:contentDescription="@string/remote_key_escape_description"
+                android:text="@string/remote_key_escape" />
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
