@@ -38,10 +38,10 @@ android {
     namespace = "org.kde.kdeconnect_tp"
     compileSdk = 37
     defaultConfig {
-        applicationId = "org.kde.kdeconnect_tp"
+        applicationId = providers.gradleProperty("personalApplicationId").orElse("com.nearo.connect").get()
         minSdk = 23
         targetSdk = 37
-        versionCode = 13703
+        versionCode = providers.gradleProperty("personalVersionCode").map { it.toInt() }.orElse(13703).get()
         versionName = "1.37.3"
         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }

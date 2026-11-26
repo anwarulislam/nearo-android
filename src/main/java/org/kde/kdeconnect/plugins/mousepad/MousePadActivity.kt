@@ -8,6 +8,7 @@ package org.kde.kdeconnect.plugins.mousepad
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -15,6 +16,7 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -63,6 +65,10 @@ class MousePadActivity :
     private var accumulatedDistanceY: Double = 0.0
     private var pendingShowKeyboard: Boolean = false
     private var keyboardShown: Boolean = false
+    private var lastTextFocusToken = ""
+    private val modifiers = linkedSetOf<String>()
+    private val keyboardDismissals by lazy { getSharedPreferences("remoteKeyboardDismissals", MODE_PRIVATE) }
+    private var watchingTextFocus = false
 
     private lateinit var mDetector: GestureDetector
     private var mSensorManager: SensorManager? = null
@@ -146,7 +152,15 @@ class MousePadActivity :
         mDetector.setOnDoubleTapListener(this)
         mSensorManager = getSystemService<SensorManager>()
 
+        binding.scrollRail.sendScroll = { dy -> sendScroll(0.0, scrollDirection * dy) }
+        binding.spacePrevious.setOnClickListener { sendSpaceShortcut(KeyEvent.KEYCODE_DPAD_LEFT) }
+        binding.spaceOverview.setOnClickListener { sendSpaceShortcut(KeyEvent.KEYCODE_DPAD_UP) }
+        binding.spaceNext.setOnClickListener { sendSpaceShortcut(KeyEvent.KEYCODE_DPAD_RIGHT) }
+
         keyListenerView = binding.keyListener
+        keyListenerView.setOnTouchListener { _, event -> handleTrackpadTouch(event) }
+        lastTextFocusToken = savedInstanceState?.getString("lastTextFocusToken").orEmpty()
+        setupShortcutKeys()
         keyListenerView.setDeviceId(plugin.device.deviceId)
         ViewCompat.setOnApplyWindowInsetsListener(keyListenerView, this)
 
@@ -185,6 +199,20 @@ class MousePadActivity :
         invalidateOptionsMenu()
 
         super.onResume()
+        if (!::plugin.isInitialized) return
+        watchingTextFocus = true
+        plugin.startTextFocus { token ->
+            if (token == lastTextFocusToken) return@startTextFocus
+            lastTextFocusToken = token
+            if (token.isNotEmpty() && token != keyboardDismissals.getString(plugin.device.deviceId, null)) {
+                if (keyboardDismissals.contains(plugin.device.deviceId)) {
+                    keyboardDismissals.edit().remove(plugin.device.deviceId).apply()
+                }
+                if (hasWindowFocus()) showKeyboard() else pendingShowKeyboard = true
+            } else {
+                pendingShowKeyboard = false
+            }
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -195,7 +223,16 @@ class MousePadActivity :
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("lastTextFocusToken", lastTextFocusToken)
+    }
+
     override fun onPause() {
+        watchingTextFocus = false
+        if (::plugin.isInitialized) plugin.stopTextFocus()
+        pendingShowKeyboard = false
+        clearShortcutKeys()
         if (gyroEnabled) {
             mSensorManager?.unregisterListener(this)
             gyroEnabled = false
@@ -267,7 +304,8 @@ class MousePadActivity :
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
+    private fun handleTrackpadTouch(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) isScrolling = false
         if (mMousePadGestureDetector.onTouchEvent(event)) {
             return true
         }
@@ -278,7 +316,7 @@ class MousePadActivity :
         val actionType = event.action
 
         if (isScrolling) {
-            if (actionType == MotionEvent.ACTION_UP) {
+            if (actionType == MotionEvent.ACTION_UP || actionType == MotionEvent.ACTION_CANCEL) {
                 isScrolling = false
             } else {
                 return false
@@ -454,9 +492,12 @@ class MousePadActivity :
     }
 
     override fun onApplyWindowInsets(v: View, insets: WindowInsetsCompat): WindowInsetsCompat {
-        val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
-        keyboardShown = imeInsets.bottom != 0 || imeInsets.top != 0 ||
-            imeInsets.left != 0 || imeInsets.right != 0
+        val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+        if (keyboardShown && !imeVisible && watchingTextFocus && hasWindowFocus()) rememberDismissal()
+        keyboardShown = imeVisible
+        binding.shortcutKeys.visibility = if (keyboardShown) View.VISIBLE else View.GONE
+        if (::plugin.isInitialized) updateMouseControls()
+        if (!keyboardShown) clearShortcutKeys()
         return ViewCompat.onApplyWindowInsets(v, insets)
     }
 
@@ -481,10 +522,50 @@ class MousePadActivity :
         plugin.sendScroll(x, y)
     }
 
+    private fun sendSpaceShortcut(keyCode: Int) {
+        if (plugin.isKeyboardEnabled) {
+            plugin.sendArrow(keyCode, control = true)
+        } else {
+            Toast.makeText(this, R.string.mousepad_keyboard_input_not_supported, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupShortcutKeys() {
+        val keys = mapOf(binding.commandKey to "super", binding.controlKey to "ctrl",
+            binding.optionKey to "alt", binding.shiftKey to "shift")
+        keys.forEach { (button, modifier) ->
+            button.isCheckable = true
+            button.setOnClickListener {
+                if (button.isChecked) modifiers.add(modifier) else modifiers.remove(modifier)
+            }
+        }
+        keyListenerView.takeModifiers = {
+            modifiers.toSet().also { clearShortcutKeys() }
+        }
+        binding.escapeKey.setOnClickListener { keyListenerView.sendEscape() }
+    }
+
+    private fun clearShortcutKeys() {
+        modifiers.clear()
+        binding.commandKey.isChecked = false
+        binding.controlKey.isChecked = false
+        binding.optionKey.isChecked = false
+        binding.shiftKey.isChecked = false
+    }
+
+    private fun rememberDismissal() {
+        if (lastTextFocusToken.isNotEmpty()) {
+            keyboardDismissals.edit().putString(plugin.device.deviceId, lastTextFocusToken).apply()
+        }
+    }
+
     private fun toggleKeyboard() {
         if (keyboardShown) {
+            rememberDismissal()
+            pendingShowKeyboard = false
             hideKeyboard()
         } else {
+            keyboardDismissals.edit().remove(plugin.device.deviceId).apply()
             showKeyboard()
         }
     }
@@ -521,6 +602,8 @@ class MousePadActivity :
         var scrollSensitivity = p.getInt(getString(R.string.mousepad_scroll_sensitivity), 100)
         if (scrollSensitivity == 0) scrollSensitivity = 1
         scrollCoefficient = (scrollSensitivity / 100f).toDouble().pow(1.5)
+
+        binding.scrollRail.sensitivity = scrollCoefficient
 
         allowGyro = isGyroSensorAvailable() && p.getBoolean(getString(R.string.gyro_mouse_enabled), false)
         if (allowGyro) {
@@ -566,7 +649,8 @@ class MousePadActivity :
                 return
             }
         }
-        if (p.getBoolean("pref_mousepad_show_keyboard", true)) {
+        if (p.getBoolean(getString(R.string.pref_mousepad_show_keyboard), false) &&
+            !keyboardDismissals.contains(plugin.device.deviceId)) {
             if (hasWindowFocus()) {
                 showKeyboard()
             } else {
@@ -577,19 +661,23 @@ class MousePadActivity :
             hideKeyboard()
         }
 
-        if (p.getBoolean(getString(R.string.mousepad_mouse_buttons_enabled_pref), true)) {
-            binding.mouseButtons.visibility = View.VISIBLE
-        } else {
-            binding.mouseButtons.visibility = View.GONE
-        }
+        updateMouseControls()
 
         doubleTapDragEnabled = p.getBoolean(getString(R.string.mousepad_doubletap_drag_enabled_pref), true)
-        binding.mousepadInfo.setText(
+        keyListenerView.contentDescription = getString(
             if (doubleTapDragEnabled) R.string.mousepad_info_double_tap
             else R.string.mousepad_info
         )
 
         prefsApplied = true
+    }
+
+    private fun updateMouseControls() {
+        val compact = keyboardShown && resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        binding.spacesHeading.visibility = if (compact) View.GONE else View.VISIBLE
+        binding.spacesButtons.visibility = binding.spacesHeading.visibility
+        val showMouse = plugin.preferences.getBoolean(getString(R.string.mousepad_mouse_buttons_enabled_pref), true)
+        binding.mouseButtons.visibility = if (showMouse && !compact) View.VISIBLE else View.GONE
     }
 
     private fun isGyroSensorAvailable(): Boolean {

@@ -1,0 +1,60 @@
+name: Build and release Android APK
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Build fork APK
+        run: |
+          ./gradlew --no-daemon --stacktrace assembleRelease \
+            -PpersonalVersionCode="$GITHUB_RUN_NUMBER"
+
+      - name: Sign and verify APK
+        env:
+          SIGNING_STORE: ${{ secrets.PERSONAL_APK_SIGNING_STORE }}
+          SIGNING_PASSWORD: ${{ secrets.PERSONAL_APK_SIGNING_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          keystore="$RUNNER_TEMP/personal.p12"
+          trap 'rm -f "$keystore"' EXIT
+          printf '%s' "$SIGNING_STORE" | base64 --decode > "$keystore"
+          unset SIGNING_STORE
+          signer=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
+          unsigned=(build/outputs/apk/release/*-unsigned.apk)
+          [[ ${#unsigned[@]} == 1 && -f ${unsigned[0]} ]]
+          "$signer" sign --ks "$keystore" --ks-key-alias personal \
+            --ks-pass env:SIGNING_PASSWORD --out KDE-Connect-Personal.apk "${unsigned[0]}"
+          "$signer" verify --verbose --print-certs KDE-Connect-Personal.apk
+
+      - name: Publish versioned download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="android-${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
+          gh release create "$tag" KDE-Connect-Personal.apk \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "KDE Connect Personal · Build $GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT" \
+            --notes "Android APK built from $GITHUB_SHA."

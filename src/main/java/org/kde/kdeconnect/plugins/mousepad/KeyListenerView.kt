@@ -22,6 +22,7 @@ class KeyListenerView(
 ) : View(context, attrs) {
 
     private var deviceId: String? = null
+    var takeModifiers: () -> Set<String> = { emptySet() }
 
     init {
         isFocusable = true
@@ -40,11 +41,22 @@ class KeyListenerView(
     override fun onCheckIsTextEditor(): Boolean = true
 
     fun sendChars(chars: CharSequence) {
-        KdeConnect.getInstance().getDevicePlugin<MousePadPlugin>(deviceId)
-            ?.sendText(chars.toString())
+        if (chars.isEmpty()) return
+        val packet = NetworkPacket(MousePadPlugin.PACKET_TYPE_MOUSEPAD_REQUEST)
+        packet["key"] = chars.toString()
+        sendKeyPressPacket(packet, applyModifiers = Character.codePointCount(chars, 0, chars.length) == 1)
     }
 
-    private fun sendKeyPressPacket(np: NetworkPacket) {
+    fun sendEscape() {
+        val packet = NetworkPacket(MousePadPlugin.PACKET_TYPE_MOUSEPAD_REQUEST)
+        packet["specialKey"] = SpecialKeysMap.get(KeyEvent.KEYCODE_ESCAPE)
+        sendKeyPressPacket(packet)
+    }
+
+    private fun sendKeyPressPacket(np: NetworkPacket, applyModifiers: Boolean = true) {
+        val modifiers = takeModifiers()
+        if (applyModifiers) modifiers.forEach { np[it] = true }
+
         KdeConnect.getInstance().getDevicePlugin<MousePadPlugin>(deviceId)
             ?.sendPacket(np)
     }

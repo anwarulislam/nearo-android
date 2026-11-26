@@ -85,4 +85,33 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         <item name="android:gravity">center</item>
         <item name="android:textSize">12sp</item>
     </style>
+    <style name="RemoteInputClickButton" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:layout_marginLeft">2dp</item>
+        <item name="android:layout_marginRight">2dp</item>
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="cornerRadius">12dp</item>
+    </style>
+
+    <style name="RemoteInputSpaceButton" parent="RemoteInputClickButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+        <item name="backgroundTint">?attr/colorPrimaryContainer</item>
+        <item name="iconTint">?attr/colorOnPrimaryContainer</item>
+        <item name="iconSize">18dp</item>
+        <item name="iconPadding">2dp</item>
+        <item name="iconGravity">textTop</item>
+    </style>
+    <style name="RemoteShortcutButton" parent="RemoteInputClickButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:focusableInTouchMode">false</item>
+        <item name="backgroundTint">@color/remote_shortcut_background</item>
+        <item name="android:textColor">@color/remote_shortcut_text</item>
+    </style>
 </resources>

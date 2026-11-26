@@ -13,7 +13,8 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         All translations for all KDE apps are handled by the [localization team](https://l10n.kde.org).
         We really appreciate your translations, but make sure to submit them by working with the proper team!
   -->
-    <string name="kde_connect">KDE Connect</string>
+    <string name="nearo_app_name" translatable="false">Nearo</string>
+    <string name="kde_connect">@string/nearo_app_name</string>
     <string name="manifest_label_share">Send to Device</string>
     <string name="foreground_notification_no_devices">Not connected to any device</string>
     <string name="foreground_notification_devices">Connected to: %s</string>
@@ -78,6 +79,18 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     <string name="remotekeyboard_multiple_connections" translatable="true">There is more than one remote keyboard connection, select the device to configure</string>
     <string name="open_mousepad">Remote input</string>
     <string name="open_mousepad_tv">TV remote</string>
+    <string name="remote_trackpad">Trackpad</string>
+    <string name="remote_scroll">Scroll</string>
+    <string name="remote_scroll_description">Scroll vertically with one finger</string>
+    <string name="remote_mac_spaces">Mac Spaces</string>
+    <string name="remote_previous">Previous</string>
+    <string name="remote_overview">Overview</string>
+    <string name="remote_next">Next</string>
+    <string name="remote_previous_description">Previous Mac Space</string>
+    <string name="remote_overview_description">Open Mission Control</string>
+    <string name="remote_next_description">Next Mac Space</string>
+    <string name="remote_click_left">Left click</string>
+    <string name="remote_click_right">Right click</string>
     <string name="mousepad_info">Move a finger on the screen to move the mouse cursor. Tap for a click, and use two/three fingers for right and middle buttons. Use 2 fingers to scroll. Use a long press to drag\'n drop. Gyro mouse functionality can be enabled from plugin preferences</string>
     <string name="mousepad_info_double_tap">Move a finger on the screen to move the mouse cursor. Tap for a click, and use two/three fingers for right and middle buttons. Use 2 fingers to scroll. Double tap to drag\'n drop. Gyro mouse functionality can be enabled from plugin preferences</string>
     <string name="mousepad_info_no_gestures">Move a finger on the screen to move the mouse cursor, tap for a click.</string>
@@ -676,4 +689,14 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     <string name="pref_mpris_volume_control_summary">Control the connected device\'s media volume using this phone\'s hardware buttons</string>
 
     <string name="pref_notification_screen_off_key" translatable="false">pref_notification_screen_off</string>
+    <string name="remote_key_command">Cmd</string>
+    <string name="remote_key_command_description">Command</string>
+    <string name="remote_key_control">Ctrl</string>
+    <string name="remote_key_control_description">Control</string>
+    <string name="remote_key_option">Opt</string>
+    <string name="remote_key_option_description">Option</string>
+    <string name="remote_key_shift">Shift</string>
+    <string name="remote_key_shift_description">Shift</string>
+    <string name="remote_key_escape">Esc</string>
+    <string name="remote_key_escape_description">Escape</string>
 </resources>

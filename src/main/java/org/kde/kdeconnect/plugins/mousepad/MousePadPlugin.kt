@@ -6,6 +6,9 @@
 package org.kde.kdeconnect.plugins.mousepad
 
 import android.Manifest
+import android.os.Handler
+import android.os.Looper
+import java.util.UUID
 import android.app.Activity
 import android.content.Intent
 import android.view.KeyEvent
@@ -21,7 +24,41 @@ class MousePadPlugin : Plugin() {
     var isKeyboardEnabled: Boolean = true
         private set
 
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var supportsFocus = false
+    private var sessionId = ""
+    private var focusListener: ((String) -> Unit)? = null
+
+    fun startTextFocus(listener: (String) -> Unit) {
+        sessionId = UUID.randomUUID().toString()
+        focusListener = listener
+        requestFocusUpdates(true)
+    }
+
+    fun stopTextFocus() {
+        requestFocusUpdates(false)
+        sessionId = ""
+        focusListener = null
+    }
+
+    private fun requestFocusUpdates(enabled: Boolean) {
+        if (!supportsFocus || sessionId.isEmpty() || !device.isReachable) return
+        val request = NetworkPacket(PACKET_TYPE_MOUSEPAD_REQUEST)
+        request["nearoWatchTextFocus"] = enabled
+        request["nearoSession"] = sessionId
+        device.sendPacket(request)
+    }
+
     override fun onPacketReceived(np: NetworkPacket): Boolean {
+        mainHandler.post {
+            if (np.has("nearoFocusSupport")) {
+                supportsFocus = np.getBoolean("nearoFocusSupport", false)
+                if (focusListener != null) requestFocusUpdates(true)
+            }
+            if (np.has("nearoFocusToken") && np.getString("nearoSession", "") == sessionId && isKeyboardEnabled) {
+                focusListener?.invoke(np.getString("nearoFocusToken", ""))
+            }
+        }
         this.isKeyboardEnabled = np.getBoolean("state", true)
         return true
     }
@@ -132,29 +169,20 @@ class MousePadPlugin : Plugin() {
         sendPacket(np)
     }
 
-    fun sendLeft() {
+    fun sendArrow(keyCode: Int, control: Boolean = false) {
         val np = NetworkPacket(PACKET_TYPE_MOUSEPAD_REQUEST)
-        np["specialKey"] = KeyListenerView.SpecialKeysMap.get(KeyEvent.KEYCODE_DPAD_LEFT)
+        np["specialKey"] = KeyListenerView.SpecialKeysMap.get(keyCode)
+        if (control) np["ctrl"] = true
         sendPacket(np)
     }
 
-    fun sendRight() {
-        val np = NetworkPacket(PACKET_TYPE_MOUSEPAD_REQUEST)
-        np["specialKey"] = KeyListenerView.SpecialKeysMap.get(KeyEvent.KEYCODE_DPAD_RIGHT)
-        sendPacket(np)
-    }
+    fun sendLeft() = sendArrow(KeyEvent.KEYCODE_DPAD_LEFT)
 
-    fun sendUp() {
-        val np = NetworkPacket(PACKET_TYPE_MOUSEPAD_REQUEST)
-        np["specialKey"] = KeyListenerView.SpecialKeysMap.get(KeyEvent.KEYCODE_DPAD_UP)
-        sendPacket(np)
-    }
+    fun sendRight() = sendArrow(KeyEvent.KEYCODE_DPAD_RIGHT)
 
-    fun sendDown() {
-        val np = NetworkPacket(PACKET_TYPE_MOUSEPAD_REQUEST)
-        np["specialKey"] = KeyListenerView.SpecialKeysMap.get(KeyEvent.KEYCODE_DPAD_DOWN)
-        sendPacket(np)
-    }
+    fun sendUp() = sendArrow(KeyEvent.KEYCODE_DPAD_UP)
+
+    fun sendDown() = sendArrow(KeyEvent.KEYCODE_DPAD_DOWN)
 
     fun sendSelect() {
         val np = NetworkPacket(PACKET_TYPE_MOUSEPAD_REQUEST)
