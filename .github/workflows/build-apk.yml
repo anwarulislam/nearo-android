@@ -1,8 +1,8 @@
-name: Build and release Android APK
+name: Build and Release Nearo APK
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   release:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -26,35 +26,55 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      - name: Build fork APK
+      - name: Build Nearo APK
         run: |
           ./gradlew --no-daemon --stacktrace assembleRelease \
             -PpersonalVersionCode="$GITHUB_RUN_NUMBER"
 
       - name: Sign and verify APK
         env:
-          SIGNING_STORE: ${{ secrets.PERSONAL_APK_SIGNING_STORE }}
-          SIGNING_PASSWORD: ${{ secrets.PERSONAL_APK_SIGNING_PASSWORD }}
+          SIGNING_STORE: ${{ secrets.NEARO_APK_SIGNING_STORE || secrets.PERSONAL_APK_SIGNING_STORE }}
+          SIGNING_PASSWORD: ${{ secrets.NEARO_APK_SIGNING_PASSWORD || secrets.PERSONAL_APK_SIGNING_PASSWORD }}
+          SIGNING_ALIAS: ${{ secrets.NEARO_APK_SIGNING_ALIAS || secrets.PERSONAL_APK_SIGNING_ALIAS }}
         run: |
           set -euo pipefail
           umask 077
-          keystore="$RUNNER_TEMP/personal.p12"
-          trap 'rm -f "$keystore"' EXIT
-          printf '%s' "$SIGNING_STORE" | base64 --decode > "$keystore"
-          unset SIGNING_STORE
           signer=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
           unsigned=(build/outputs/apk/release/*-unsigned.apk)
           [[ ${#unsigned[@]} == 1 && -f ${unsigned[0]} ]]
-          "$signer" sign --ks "$keystore" --ks-key-alias personal \
-            --ks-pass env:SIGNING_PASSWORD --out KDE-Connect-Personal.apk "${unsigned[0]}"
-          "$signer" verify --verbose --print-certs KDE-Connect-Personal.apk
+
+          if [[ -n "${SIGNING_STORE:-}" ]]; then
+            echo "Signing with release keystore..."
+            keystore="$RUNNER_TEMP/release.p12"
+            trap 'rm -f "$keystore"' EXIT
+            printf '%s' "$SIGNING_STORE" | base64 --decode > "$keystore"
+            unset SIGNING_STORE
+            key_alias="${SIGNING_ALIAS:-personal}"
+            "$signer" sign --ks "$keystore" --ks-key-alias "$key_alias" \
+              --ks-pass env:SIGNING_PASSWORD --out Nearo.apk "${unsigned[0]}"
+          elif [[ -f "debug.keystore" ]]; then
+            echo "No signing secret found; signing with debug keystore..."
+            "$signer" sign --ks debug.keystore --ks-key-alias androiddebugkey \
+              --ks-pass pass:android --out Nearo.apk "${unsigned[0]}"
+          else
+            echo "No keystore found; copying unsigned APK..."
+            cp "${unsigned[0]}" Nearo.apk
+          fi
+
+          "$signer" verify --verbose --print-certs Nearo.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nearo-APK
+          path: Nearo.apk
 
       - name: Publish versioned download
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="android-${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
-          gh release create "$tag" KDE-Connect-Personal.apk \
+          tag="v${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
+          gh release create "$tag" Nearo.apk \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "KDE Connect Personal · Build $GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT" \
-            --notes "Android APK built from $GITHUB_SHA."
+            --title "Nearo · Build $GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT" \
+            --notes "Nearo Android APK built from commit $GITHUB_SHA."
