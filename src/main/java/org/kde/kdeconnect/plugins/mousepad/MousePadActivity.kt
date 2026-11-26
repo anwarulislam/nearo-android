@@ -31,6 +31,7 @@ import org.kde.kdeconnect.KdeConnect
 import org.kde.kdeconnect.base.BaseActivity
 import org.kde.kdeconnect.ui.PluginSettingsActivity
 import org.kde.kdeconnect.ui.compose.components.addDeviceDisconnectedOverlay
+import org.kde.kdeconnect.ui.showDeviceStatus
 import org.kde.kdeconnect_tp.R
 import org.kde.kdeconnect_tp.databinding.ActivityMousepadBinding
 import kotlin.math.abs
@@ -143,7 +144,7 @@ class MousePadActivity :
         plugin = KdeConnect.getInstance().getDevicePlugin<MousePadPlugin>(intent.getStringExtra(EXTRA_DEVICE_ID))
             ?: return finish()
         binding.root.addDeviceDisconnectedOverlay(plugin.device)
-        supportActionBar?.subtitle = plugin.device.name
+        showDeviceStatus(plugin.device)
 
         window.decorView.isHapticFeedbackEnabled = true
 

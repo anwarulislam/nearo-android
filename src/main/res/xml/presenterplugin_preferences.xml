@@ -11,7 +11,7 @@
         android:key="@string/pref_presenter_enable_volume_keys"
         android:summary="@string/pref_presenter_enable_volume_keys_summary"
         android:title="@string/pref_presenter_enable_volume_keys_title" />
-    <SeekBarPreference
+    <org.kde.kdeconnect.ui.SensitivityPreference
         android:id="@+id/presenter_sensitivity_pointer"
         android:defaultValue="50"
         android:key="@string/pref_presenter_sensitivity"

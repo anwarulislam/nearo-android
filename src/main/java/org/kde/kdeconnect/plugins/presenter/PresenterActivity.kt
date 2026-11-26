@@ -66,6 +66,7 @@ import org.kde.kdeconnect.ui.compose.KdeOverflowMenu
 import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.KdeTopAppBar
 import org.kde.kdeconnect.ui.compose.components.DeviceDisconnectedOverlay
+import org.kde.kdeconnect.ui.deviceStatusText
 import org.kde.kdeconnect_tp.R
 
 private const val VOLUME_UP = 1
@@ -108,7 +109,7 @@ class PresenterActivity : AppCompatActivity(), SensorEventListener, OnSharedPref
         prefs.registerOnSharedPreferenceChangeListener(this)
         applyPrefs()
 
-        setContent { PresenterScreen(plugin.device.name, plugin.device) }
+        setContent { PresenterScreen(deviceStatusText(plugin.device), plugin.device) }
         createMediaSession()
     }
 

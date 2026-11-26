@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 
@@ -28,7 +27,6 @@ abstract class BaseFragment<VB: ViewBinding> : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setActionBarText(null, null) // Clear text from previous screen
         _binding = onInflateBinding(inflater, container, savedInstanceState)
         return binding.root
     }
@@ -36,16 +34,5 @@ abstract class BaseFragment<VB: ViewBinding> : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    protected fun setActionBarText(title: CharSequence?, subtitle: CharSequence? = null) {
-        (activity  as? AppCompatActivity?)?.supportActionBar?.apply {
-            this.title = title
-            this.subtitle = subtitle
-        }
-    }
-
-    protected fun setActionBarSubtitle(subtitle: CharSequence? = null) {
-        (activity  as? AppCompatActivity?)?.supportActionBar?.subtitle = subtitle
     }
 }

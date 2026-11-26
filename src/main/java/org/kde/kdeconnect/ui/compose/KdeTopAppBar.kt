@@ -6,6 +6,9 @@
 
 package org.kde.kdeconnect.ui.compose
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
@@ -14,8 +17,12 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,6 +38,9 @@ fun KdeTopAppBar(
     actions: @Composable (RowScope.() -> Unit) = {},
 ) {
     TopAppBar(
+        modifier = Modifier.statusBarsPadding().padding(horizontal = 12.dp, vertical = 4.dp).clip(MaterialTheme.shapes.extraLarge),
+        windowInsets = WindowInsets(0),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         navigationIcon = {
             FilledTonalIconButton(onClick = navIconOnClick, content = { Icon(navIcon, navIconDescription) })
         },

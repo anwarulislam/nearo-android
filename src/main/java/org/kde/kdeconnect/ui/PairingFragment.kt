@@ -14,9 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,9 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.kde.kdeconnect.BackgroundService
@@ -38,11 +33,10 @@ import org.kde.kdeconnect.helpers.TrustedNetworkHelper
 import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.screen.pairing.PairingScreen
 import org.kde.kdeconnect.ui.compose.screen.pairing.PairingViewModel
-import org.kde.kdeconnect_tp.R
 import org.kde.kdeconnect_tp.databinding.DevicesListBinding
 
 /**
- * The view that the user will see when there are no devices paired, or when you choose "add a new device" from the sidebar.
+ * The view that the user will see when there are no devices paired, or when you choose "add a new device" from the device dashboard.
  */
 class PairingFragment : BaseFragment<DevicesListBinding>() {
 
@@ -53,34 +47,6 @@ class PairingFragment : BaseFragment<DevicesListBinding>() {
     // Single instance so we don't create one observer per updateDeviceList call
     private val connectivityObserver = Observer<Boolean> { updateConnectivityInfoHeader(it) }
 
-    private val menuProvider = object : MenuProvider {
-
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.pairing, menu)
-        }
-
-        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-            return when (menuItem.itemId) {
-                R.id.menu_refresh -> {
-                    viewModel.onRefresh()
-                    true
-                }
-
-                R.id.menu_custom_device_list -> {
-                    startActivity(Intent(activity, CustomDevicesActivity::class.java))
-                    true
-                }
-
-                R.id.menu_trusted_networks -> {
-                    startActivity(Intent(activity, TrustedNetworksActivity::class.java))
-                    true
-                }
-
-                else -> false
-            }
-        }
-    }
-
     override fun onInflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -89,10 +55,6 @@ class PairingFragment : BaseFragment<DevicesListBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setActionBarText(getString(R.string.nearo_app_name))
-
-        activity?.addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
         createComposeView()
     }
 
@@ -151,6 +113,7 @@ class PairingFragment : BaseFragment<DevicesListBinding>() {
                                 localNetworkPermissionLauncher.launch(Manifest.permission.ACCESS_LOCAL_NETWORK)
                             }
                         },
+                        onTrustedNetworksClick = { startActivity(Intent(requireContext(), TrustedNetworksActivity::class.java)) },
                         onAddByIpClick = { startActivity(Intent(requireContext(), CustomDevicesActivity::class.java)) },
                         onRefresh = { viewModel.onRefresh() }
                     )

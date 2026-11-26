@@ -24,6 +24,7 @@ import org.kde.kdeconnect.base.BaseActivity
 import org.kde.kdeconnect.extensions.viewBinding
 import org.kde.kdeconnect.ui.PluginSettingsActivity
 import org.kde.kdeconnect.ui.compose.components.addDeviceDisconnectedOverlay
+import org.kde.kdeconnect.ui.showDeviceStatus
 import org.kde.kdeconnect_tp.R
 import org.kde.kdeconnect_tp.databinding.ActivityDigitizerBinding
 import kotlin.math.roundToInt
@@ -41,6 +42,7 @@ class DigitizerActivity : BaseActivity<ActivityDigitizerBinding>(), DrawingPadVi
         plugin = KdeConnect.getInstance().getDevicePlugin<DigitizerPlugin>(intent.getStringExtra(EXTRA_DEVICE_ID))
             ?: return finish()
         binding.root.addDeviceDisconnectedOverlay(plugin.device)
+        showDeviceStatus(plugin.device)
 
         setSupportActionBar(binding.toolbarLayout.toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)

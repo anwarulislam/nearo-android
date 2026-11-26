@@ -15,9 +15,7 @@ import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.Spanned
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,6 +32,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kde.kdeconnect.KdeConnect
 import org.kde.kdeconnect.BackgroundService
 import org.kde.kdeconnect.extensions.setupBottomPadding
 import org.kde.kdeconnect.helpers.CreateFileParams
@@ -46,17 +45,18 @@ import org.kde.kdeconnect_tp.BuildConfig
 import org.kde.kdeconnect_tp.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        if (activity != null) {
-            (activity as? MainActivity)?.supportActionBar?.setTitle(R.string.settings)
-            (activity as? MainActivity)?.supportActionBar?.subtitle = null
-        }
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
+    private lateinit var pluginSettings: PreferenceCategory
+    private var listedDevices: List<Pair<String, String>>? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val context = preferenceManager.context
         val screen = preferenceManager.createPreferenceScreen(context)
+
+        screen.addPreference(Preference(context).apply {
+            layoutResource = R.layout.nearo_preference_heading
+            setTitle(R.string.settings)
+            isSelectable = false
+        })
 
         fun section(title: Int, vararg entries: Pair<Preference, Int>) {
             val group = PreferenceCategory(context).apply {
@@ -65,7 +65,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             screen.addPreference(group)
             for ((preference, icon) in entries) {
-                preference.layoutResource = R.layout.nearo_preference
                 preference.setIcon(icon)
                 group.addPreference(preference)
             }
@@ -81,9 +80,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
             devicesByIpPref(context) to R.drawable.ic_device_desktop_32dp,
             bluetoothSupportPref(context) to R.drawable.ic_phonelink_36dp
         )
+        pluginSettings = PreferenceCategory(context).apply { setTitle(R.string.device_menu_plugins) }
+        screen.addPreference(pluginSettings)
+        listedDevices = null
+        updatePluginSettings()
+
         section(R.string.settings_support,
-            exportLogsPref(context) to R.drawable.ic_baseline_code_24,
-            moreSettingsPref(context) to R.drawable.ic_settings_24dp
+            exportLogsPref(context) to R.drawable.ic_baseline_code_24
         )
 
         preferenceScreen = screen
@@ -279,11 +282,46 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
-    private fun moreSettingsPref(context: Context) = Preference(context).apply {
-        isPersistent = false
-        isSelectable = false
-        setTitle(R.string.settings_more_settings_title)
-        setSummary(R.string.settings_more_settings_text)
+    override fun onStart() {
+        super.onStart()
+        KdeConnect.getInstance().addDeviceListChangedCallback("SettingsFragment") {
+            activity?.runOnUiThread { if (isAdded) updatePluginSettings() }
+        }
+        updatePluginSettings()
+    }
+
+    override fun onStop() {
+        KdeConnect.getInstance().removeDeviceListChangedCallback("SettingsFragment")
+        super.onStop()
+    }
+
+    private fun updatePluginSettings() {
+        val devices = KdeConnect.getInstance().devices.values.filter { it.isPaired }.sortedBy { it.name }
+        val names = devices.map { it.deviceId to it.name }
+        if (names == listedDevices) return
+        listedDevices = names
+        pluginSettings.removeAll()
+        val context = preferenceManager.context
+        if (devices.isEmpty()) {
+            pluginSettings.addPreference(Preference(context).apply {
+                setTitle(R.string.pair_new_device)
+                setIcon(R.drawable.ic_phonelink_36dp)
+                setOnPreferenceClickListener {
+                    (requireActivity() as MainActivity).onDeviceSelected(null)
+                    true
+                }
+            })
+        }
+        for (device in devices) {
+            pluginSettings.addPreference(Preference(context).apply {
+                title = device.name
+                setIcon(device.iconDrawable)
+                setOnPreferenceClickListener {
+                    startActivity(PluginSettingsActivity.createIntent(context, device.deviceId))
+                    true
+                }
+            })
+        }
     }
 
     companion object {

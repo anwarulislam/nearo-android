@@ -19,8 +19,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.SeekBar
-import android.widget.SeekBar.OnSeekBarChangeListener
+import com.google.android.material.slider.Slider
+import kotlin.math.roundToInt
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -48,13 +48,14 @@ class MprisNowPlayingFragment : BaseFragment<MprisNowPlayingBinding>(), VolumeKe
     private val mprisControlBinding: MprisControlBinding get() = binding.mprisControl
     private lateinit var plugin: MprisPlugin
 
+    private var scrubbing = false
     private val positionSeekUpdateHandler = Handler(Looper.getMainLooper())
     private val positionSeekUpdateRunnable = object : Runnable {
         override fun run() {
             if (!hasBinding) return // View was already destroyed
 
             targetPlayer?.let {
-                mprisControlBinding.positionSeek.progress = it.position.toInt()
+                mprisControlBinding.positionSeek.apply { value = it.position.toFloat().coerceIn(valueFrom, valueTo) }
             }
             positionSeekUpdateHandler.removeCallbacks(this)
             positionSeekUpdateHandler.postDelayed(this, 1000)
@@ -91,7 +92,6 @@ class MprisNowPlayingFragment : BaseFragment<MprisNowPlayingBinding>(), VolumeKe
 
         val deviceId = requireArguments().getString(EXTRA_DEVICE_ID)!!
         val device = KdeConnect.getInstance().getDevice(deviceId)
-        setActionBarText(getString(R.string.open_mpris_controls), device?.name)
         plugin = device?.getPlugin<MprisPlugin>() ?: run {
             requireActivity().finish()
             return
@@ -132,15 +132,9 @@ class MprisNowPlayingFragment : BaseFragment<MprisNowPlayingBinding>(), VolumeKe
 
         performActionOnClick(mprisControlBinding.stopButton, MprisPlayer::sendStop)
 
-        mprisControlBinding.volumeSeek.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, isFromUser: Boolean) {
-                if (isFromUser) targetPlayer?.sendSetVolume(seekBar.progress)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
+        mprisControlBinding.volumeSeek.addOnChangeListener { _, value, fromUser ->
+            if (fromUser) targetPlayer?.sendSetVolume(value.roundToInt())
+        }
 
         positionSeekUpdateHandler.postDelayed(positionSeekUpdateRunnable, 200)
 
@@ -149,21 +143,19 @@ class MprisNowPlayingFragment : BaseFragment<MprisNowPlayingBinding>(), VolumeKe
             updateTimeViews()
         }
 
-        mprisControlBinding.positionSeek.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, byUser: Boolean) {
-                mprisControlBinding.progressTextview.text = durationToProgress(progress.milliseconds)
-                if (showRemainingTime) {
-                    val remaining = ((targetPlayer?.length ?: 0) - progress).coerceAtLeast(0)
-                    mprisControlBinding.timeTextview.text = "-${durationToProgress(remaining.milliseconds)}"
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
+        mprisControlBinding.positionSeek.addOnChangeListener { _, value, fromUser ->
+            updateTimeViews()
+            if (fromUser && !scrubbing) targetPlayer?.sendSetPosition(value.roundToInt())
+        }
+        mprisControlBinding.positionSeek.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
+                scrubbing = true
                 positionSeekUpdateHandler.removeCallbacks(positionSeekUpdateRunnable)
             }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-                targetPlayer?.sendSetPosition(seekBar.progress)
+            override fun onStopTrackingTouch(slider: Slider) {
+                scrubbing = false
+                targetPlayer?.sendSetPosition(slider.value.roundToInt())
                 positionSeekUpdateHandler.postDelayed(positionSeekUpdateRunnable, 200)
             }
         })
@@ -189,6 +181,7 @@ class MprisNowPlayingFragment : BaseFragment<MprisNowPlayingBinding>(), VolumeKe
 
     override fun onDestroyView() {
         positionSeekUpdateHandler.removeCallbacks(positionSeekUpdateRunnable)
+        scrubbing = false
         unregisterPluginHandlers()
         mprisControlBinding.playerSpinner.adapter = null
         super.onDestroyView()
@@ -319,8 +312,11 @@ class MprisNowPlayingFragment : BaseFragment<MprisNowPlayingBinding>(), VolumeKe
         }
 
         if (playerStatus.isSeekAllowed) {
-            mprisControlBinding.positionSeek.max = playerStatus.length.toInt()
-            mprisControlBinding.positionSeek.progress = playerStatus.position.toInt()
+            mprisControlBinding.positionSeek.apply {
+                valueTo = playerStatus.length.coerceIn(1L, Int.MAX_VALUE.toLong()).toFloat()
+                if (!scrubbing || value > valueTo) value = playerStatus.position.toFloat().coerceIn(valueFrom, valueTo)
+                isEnabled = playerStatus.length > 0
+            }
             updateTimeViews()
             mprisControlBinding.progressSlider.visibility = View.VISIBLE
         } else {
@@ -328,10 +324,8 @@ class MprisNowPlayingFragment : BaseFragment<MprisNowPlayingBinding>(), VolumeKe
         }
 
         val volume = playerStatus.volume
-        mprisControlBinding.volumeSeek.progress = volume
-        if (!playerStatus.isSetVolumeAllowed) {
-            mprisControlBinding.volumeSeek.isEnabled = false
-        }
+        mprisControlBinding.volumeSeek.value = volume.coerceIn(0, 100).toFloat()
+        mprisControlBinding.volumeSeek.isEnabled = playerStatus.isSetVolumeAllowed
         val isPlaying = playerStatus.isPlaying
         if (isPlaying) {
             mprisControlBinding.playButton.setIconResource(R.drawable.ic_pause_black)
@@ -384,7 +378,7 @@ class MprisNowPlayingFragment : BaseFragment<MprisNowPlayingBinding>(), VolumeKe
 
     private fun updateTimeViews() {
         val player = targetPlayer ?: return
-        val currentPosition = mprisControlBinding.positionSeek.progress.toLong()
+        val currentPosition = mprisControlBinding.positionSeek.value.toLong()
         mprisControlBinding.progressTextview.text = durationToProgress(currentPosition.milliseconds)
         if (showRemainingTime) {
             val remaining = (player.length - currentPosition).coerceAtLeast(0)

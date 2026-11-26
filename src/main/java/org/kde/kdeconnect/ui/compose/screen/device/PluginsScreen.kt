@@ -55,6 +55,7 @@ import org.kde.kdeconnect_tp.R
 
 @Composable
 fun PluginsScreen(
+    header: @Composable () -> Unit = {},
     pluginsWithButtons: List<Plugin.PluginUiButton>,
     pluginsNeedPermissions: List<Plugin>,
     pluginsNeedOptionalPermissions: List<Plugin>,
@@ -63,6 +64,7 @@ fun PluginsScreen(
     actionNeedOptionalPermissions: (plugin: Plugin) -> Unit,
 ) {
     PluginsScreenContent(
+        header = header,
         pluginsWithButtons = pluginsWithButtons,
         pluginsNeedPermissions = pluginsNeedPermissions,
         pluginsNeedOptionalPermissions = pluginsNeedOptionalPermissions,
@@ -74,6 +76,7 @@ fun PluginsScreen(
 
 @Composable
 private fun PluginsScreenContent(
+    header: @Composable () -> Unit = {},
     pluginsWithButtons: List<Plugin.PluginUiButton>,
     pluginsNeedPermissions: List<Plugin>,
     pluginsNeedOptionalPermissions: List<Plugin>,
@@ -91,6 +94,7 @@ private fun PluginsScreenContent(
                 .padding(bottom = bottomPadding + 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Column(Modifier.widthIn(max = 840.dp).padding(horizontal = 16.dp, vertical = 8.dp)) { header() }
             val numColumns = if (LocalDensity.current.fontScale > 1.5f) 1 else LocalResources.current.getInteger(R.integer.plugins_columns)
             if (pluginsWithButtons.isNotEmpty()) {
                 Column(Modifier.widthIn(max = 840.dp).padding(horizontal = 16.dp)) {

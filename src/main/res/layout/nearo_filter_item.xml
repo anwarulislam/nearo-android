@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL -->
+<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:gravity="center_vertical" android:minHeight="60dp"
+    android:paddingStart="28dp" android:paddingEnd="28dp"
+    android:background="@drawable/nearo_list_surface" android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+    android:textAppearance="?attr/textAppearanceTitleMedium" />

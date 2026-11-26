@@ -30,11 +30,13 @@ import org.kde.kdeconnect_tp.R
 
 @Composable
 fun DeviceErrorScreen(
+    header: @Composable () -> Unit = {},
     message: String,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
 ) {
     DeviceErrorScreenContent(
+        header = header,
         message = message,
         isRefreshing = isRefreshing,
         onRefresh = onRefresh
@@ -43,6 +45,7 @@ fun DeviceErrorScreen(
 
 @Composable
 private fun DeviceErrorScreenContent(
+    header: @Composable () -> Unit = {},
     message: String,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
@@ -60,7 +63,7 @@ private fun DeviceErrorScreenContent(
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            DeviceIcon(R.drawable.ic_phonelink_off_36dp)
+            header()
             Text(message, style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
             FilledTonalButton(onClick = onRefresh) { Text(stringResource(R.string.refresh)) }
         }

@@ -11,14 +11,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.screen.about.AboutScreen
-import org.kde.kdeconnect_tp.R
 
 class AboutFragment : Fragment() {
     companion object {
@@ -59,15 +57,6 @@ class AboutFragment : Fragment() {
                     )
                 }
             }
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        (requireActivity() as? AppCompatActivity)?.supportActionBar?.let { actionBar ->
-            actionBar.title = getString(R.string.about)
-            actionBar.subtitle = null
         }
     }
 

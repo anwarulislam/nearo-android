@@ -20,6 +20,7 @@ import org.kde.kdeconnect.base.BaseActivity
 import org.kde.kdeconnect.extensions.viewBinding
 import org.kde.kdeconnect.ui.PermissionsAlertDialogFragment
 import org.kde.kdeconnect.ui.compose.components.addDeviceDisconnectedOverlay
+import org.kde.kdeconnect.ui.showDeviceStatus
 import org.kde.kdeconnect_tp.R
 import org.kde.kdeconnect_tp.databinding.ActivityBigscreenBinding
 
@@ -54,6 +55,7 @@ class BigscreenActivity : BaseActivity<ActivityBigscreenBinding>() {
         plugin = KdeConnect.getInstance().getDevicePlugin<MousePadPlugin>(intent.getStringExtra(EXTRA_DEVICE_ID))
             ?: return finish()
         binding.root.addDeviceDisconnectedOverlay(plugin.device)
+        showDeviceStatus(plugin.device)
 
         binding.leftButton.setOnClickListener { plugin.sendLeft() }
         binding.rightButton.setOnClickListener { plugin.sendRight() }

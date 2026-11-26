@@ -40,6 +40,7 @@ import org.kde.kdeconnect.ui.compose.KdeTextButton
 import org.kde.kdeconnect.ui.compose.KdeTextField
 import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.KdeTopAppBar
+import org.kde.kdeconnect.ui.deviceStatusText
 import org.kde.kdeconnect_tp.R
 
 private const val INPUT_CACHE_KEY = "compose_send_input_cache"
@@ -96,6 +97,7 @@ class ComposeSendActivity : AppCompatActivity() {
                 topBar = {
                     KdeTopAppBar(
                         title = stringResource(R.string.compose_send_title),
+                        subTitle = deviceStatusText(plugin.device),
                         navIconOnClick = { onBackPressedDispatcher.onBackPressed() },
                         navIconDescription = getString(androidx.appcompat.R.string.abc_action_bar_up_description),
                         actions = {

@@ -48,6 +48,8 @@ import org.kde.kdeconnect.ui.compose.components.DeviceListItem
 import org.kde.kdeconnect.ui.compose.components.KdeThemePreviews
 import org.kde.kdeconnect.ui.compose.components.SectionHeader
 import org.kde.kdeconnect.ui.compose.model.device.DeviceUiModel
+import org.kde.kdeconnect.ui.compose.KdeOverflowMenu
+import org.kde.kdeconnect.ui.compose.KdeDropdownMenuItem
 import org.kde.kdeconnect_tp.R
 
 @Composable
@@ -57,6 +59,7 @@ fun PairingScreen(
     onWifiSettingsClick: () -> Unit = {},
     onNotificationSettingsClick: () -> Unit = {},
     onLocalNetworkPermissionClick: () -> Unit = {},
+    onTrustedNetworksClick: () -> Unit = {},
     onAddByIpClick: () -> Unit = {},
     onRefresh: () -> Unit = {}
 ) {
@@ -72,7 +75,7 @@ fun PairingScreen(
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
             item {
-                DiscoveryPanel(showDescription = hasPermissions && hasNetwork && uiState.isTrustedNetwork, onRefresh)
+                DiscoveryPanel(showDescription = hasPermissions && hasNetwork && uiState.isTrustedNetwork, onRefresh, onAddByIpClick, onTrustedNetworksClick)
             }
             if (!uiState.hasLocalNetworkPermission) {
                 item { Notice(R.string.pairing_missing_local_network_permission, R.drawable.ic_warning, onLocalNetworkPermissionClick) }
@@ -121,7 +124,12 @@ private fun LazyListScope.deviceGroup(title: Int, devices: List<DeviceUiModel>, 
 }
 
 @Composable
-private fun DiscoveryPanel(showDescription: Boolean, onRefresh: () -> Unit) {
+private fun DiscoveryPanel(
+    showDescription: Boolean,
+    onRefresh: () -> Unit,
+    onAddByIpClick: () -> Unit,
+    onTrustedNetworksClick: () -> Unit
+) {
     Surface(
         shape = MaterialTheme.shapes.extraLarge,
         color = colorResource(R.color.nearo_ink),
@@ -142,16 +150,22 @@ private fun DiscoveryPanel(showDescription: Boolean, onRefresh: () -> Unit) {
             if (showDescription) {
                 Text(stringResource(R.string.pairing_description), style = MaterialTheme.typography.bodyLarge)
             }
-            Button(
-                onClick = onRefresh,
-                shapes = ButtonDefaults.shapes(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(R.color.nearo_lime),
-                    contentColor = colorResource(R.color.nearo_ink)
-                )
-            ) {
-                Icon(painterResource(R.drawable.ic_action_refresh_24dp), null, Modifier.size(20.dp))
-                Text(stringResource(R.string.refresh), Modifier.padding(start = 8.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Button(
+                    onClick = onRefresh,
+                    shapes = ButtonDefaults.shapes(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(R.color.nearo_lime),
+                        contentColor = colorResource(R.color.nearo_ink)
+                    )
+                ) {
+                    Icon(painterResource(R.drawable.ic_action_refresh_24dp), null, Modifier.size(20.dp))
+                    Text(stringResource(R.string.refresh), Modifier.padding(start = 8.dp))
+                }
+                KdeOverflowMenu { dismiss ->
+                    KdeDropdownMenuItem(stringResource(R.string.custom_device_list)) { dismiss(); onAddByIpClick() }
+                    KdeDropdownMenuItem(stringResource(R.string.trusted_networks)) { dismiss(); onTrustedNetworksClick() }
+                }
             }
         }
     }

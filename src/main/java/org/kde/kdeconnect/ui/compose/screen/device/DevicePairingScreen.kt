@@ -38,6 +38,7 @@ import org.kde.kdeconnect_tp.R
 
 @Composable
 fun DevicePairingScreen(
+    header: @Composable () -> Unit = {},
     pairStatus: PairingHandler.PairState,
     verificationKey: String,
     pairMessage: String? = null,
@@ -46,6 +47,7 @@ fun DevicePairingScreen(
     onRejectPairing: () -> Unit
 ) {
     DevicePairingScreenContent(
+        header = header,
         pairStatus = pairStatus,
         verificationKey = verificationKey,
         pairMessage = pairMessage,
@@ -58,6 +60,7 @@ fun DevicePairingScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun DevicePairingScreenContent(
+    header: @Composable () -> Unit = {},
     pairStatus: PairingHandler.PairState,
     verificationKey: String,
     pairMessage: String? = null,
@@ -67,8 +70,10 @@ private fun DevicePairingScreenContent(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        header()
         Surface(
             modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge,

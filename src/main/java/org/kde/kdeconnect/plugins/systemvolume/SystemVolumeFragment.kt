@@ -48,7 +48,6 @@ class SystemVolumeFragment : BaseFragment<SystemVolumeFragmentBinding>(),
             setupBottomPadding()
         }
         val device = KdeConnect.getInstance().getDevice(deviceId)
-        setActionBarText(getString(R.string.open_mpris_controls), device?.name)
         plugin = device?.getPlugin<SystemVolumePlugin>() ?: return
         registerPluginHandlers()
         sinksChanged()

@@ -70,6 +70,7 @@ import org.kde.kdeconnect.ui.compose.KdeOverflowMenu
 import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.KdeTopAppBar
 import org.kde.kdeconnect.ui.compose.components.DeviceDisconnectedOverlay
+import org.kde.kdeconnect.ui.deviceStatusText
 import org.kde.kdeconnect_tp.R
 
 @Composable
@@ -110,7 +111,7 @@ fun RunCommandScreen(
             modifier = Modifier.safeDrawingPadding(),
             topBar = {
                 RunCommandAppBar(
-                    subTitle = device.name,
+                    subTitle = deviceStatusText(device),
                     onBackPressedDispatcher = onBackPressedDispatcher,
                     showClearOutput = showOutputCard,
                     onClearOutput = { plugin.clearOutput() },

@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
-import android.widget.CheckBox
 import android.widget.ListView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -27,8 +26,7 @@ class TrustedNetworksActivity : BaseActivity<TrustedNetworkListBinding>() {
 
     private val trustedNetworksView: ListView
         get() = binding.list
-    private val allowAllCheckBox: CheckBox
-        get() = binding.trustAllNetworksCheckBox
+    private val allowAllNetworks get() = binding.trustAllNetworks
     private val trustedNetworkHelper: TrustedNetworkHelper by lazy {
         TrustedNetworkHelper(applicationContext) // Lazy to avoid creating it before onCreate, because it needs the context
     }
@@ -37,7 +35,7 @@ class TrustedNetworksActivity : BaseActivity<TrustedNetworkListBinding>() {
 
     private val locationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) {
-            allowAllCheckBox.isChecked = false
+            allowAllNetworks.isChecked = false
         }
     }
 
@@ -58,13 +56,13 @@ class TrustedNetworksActivity : BaseActivity<TrustedNetworkListBinding>() {
 
         trustedNetworks.addAll(trustedNetworkHelper.trustedNetworks)
 
-        allowAllCheckBox.setOnCheckedChangeListener { _, isChecked ->
+        allowAllNetworks.setOnCheckedChangeListener { _, isChecked ->
             if (trustedNetworkHelper.hasPermissions) {
                 trustedNetworkHelper.allNetworksAllowed = isChecked
                 updateTrustedNetworkListView()
                 addNetworkButton()
             } else {
-                allowAllCheckBox.isChecked = true // Disable unchecking it
+                allowAllNetworks.isChecked = true // Disable unchecking it
                 locationPermissionDialog = MaterialAlertDialogBuilder(this)
                     .setTitle(R.string.location_permission_needed_title)
                     .setMessage(R.string.location_permission_needed_desc)
@@ -73,7 +71,7 @@ class TrustedNetworksActivity : BaseActivity<TrustedNetworkListBinding>() {
                     .show()
             }
         }
-        allowAllCheckBox.isChecked = trustedNetworkHelper.allNetworksAllowed
+        allowAllNetworks.isChecked = trustedNetworkHelper.allNetworksAllowed
 
         updateTrustedNetworkListView()
     }
@@ -94,7 +92,7 @@ class TrustedNetworksActivity : BaseActivity<TrustedNetworkListBinding>() {
         trustedNetworksView.onItemClickListener =
             OnItemClickListener { _, _, position, _ ->
                 val targetItem = trustedNetworks[position]
-                AlertDialog.Builder(this@TrustedNetworksActivity)
+                MaterialAlertDialogBuilder(this@TrustedNetworksActivity)
                     .setMessage("Delete $targetItem ?")
                     .setPositiveButton("Yes") { _, _ ->
                         trustedNetworks.removeAt(position)

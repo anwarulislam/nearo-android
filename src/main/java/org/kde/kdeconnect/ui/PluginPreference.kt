@@ -8,6 +8,9 @@ package org.kde.kdeconnect.ui
 import android.content.Context
 import android.util.TypedValue
 import android.view.View
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreference
 import org.kde.kdeconnect.Device
@@ -47,7 +50,7 @@ class PluginPreference : SwitchPreference {
 
         val toggleListener = View.OnClickListener {
             val newState = !device.isPluginEnabled(pluginKey)
-            isChecked = newState // It actually works on API<14
+            isChecked = newState
             onStateChanged(holder, newState)
             device.setPluginEnabled(pluginKey, newState)
         }
@@ -56,6 +59,15 @@ class PluginPreference : SwitchPreference {
         val widget = holder.findViewById(android.R.id.widget_frame)
         val parent = holder.itemView
         content.setOnClickListener(listener)
+        widget.contentDescription = title
+        ViewCompat.setAccessibilityDelegate(widget, object : AccessibilityDelegateCompat() {
+            override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                super.onInitializeAccessibilityNodeInfo(host, info)
+                info.className = android.widget.Switch::class.java.name
+                info.isCheckable = true
+                info.isChecked = isChecked
+            }
+        })
         widget.setOnClickListener(toggleListener)
         parent.setOnClickListener(toggleListener)
 
@@ -80,6 +92,11 @@ class PluginPreference : SwitchPreference {
 
         val hasDetails = isEnabled && listener != null && device.isReachable && device.isPaired
 
+        holder.findViewById(R.id.open_settings).visibility = if (hasDetails) View.VISIBLE else View.GONE
+        widget.importantForAccessibility = if (hasDetails) View.IMPORTANT_FOR_ACCESSIBILITY_YES else View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+        widget.isFocusable = hasDetails
+        content.isFocusable = hasDetails
+        parent.isFocusable = !hasDetails
         divider.visibility = if (hasDetails) View.VISIBLE else View.GONE
         content.isClickable = hasDetails
         widget.isClickable = hasDetails

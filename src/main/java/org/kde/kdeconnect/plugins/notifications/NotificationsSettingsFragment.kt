@@ -29,7 +29,7 @@ import android.widget.BaseAdapter
 import android.widget.CheckBox
 import android.widget.CheckedTextView
 import android.widget.ListView
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.getSystemService
 import androidx.core.graphics.createBitmap
@@ -68,7 +68,7 @@ class NotificationsSettingsFragment : PluginSettingsFragment() {
         override fun getItemId(position: Int): Long = (position - 1).toLong()
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val view = convertView ?: layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, parent, false)
+            val view = convertView ?: layoutInflater.inflate(R.layout.nearo_filter_item, parent, false)
             val checkedTextView = view as CheckedTextView
             if (position == 0) {
                 checkedTextView.setText(R.string.all)
@@ -262,7 +262,7 @@ class NotificationsSettingsFragment : PluginSettingsFragment() {
         listView.setOnItemLongClickListener { _, _, i, _ ->
             if (i == 0) return@setOnItemLongClickListener true
             val context = requireContext()
-            val builder = AlertDialog.Builder(context)
+            val builder = MaterialAlertDialogBuilder(context)
             val mView = layoutInflater.inflate(R.layout.popup_notificationsfilter, null)
             builder.setMessage(getString(R.string.extra_options))
 
@@ -277,7 +277,7 @@ class NotificationsSettingsFragment : PluginSettingsFragment() {
             lv.setOnItemClickListener { _, _, newI, _ ->
                 when (newI) {
                     0 -> {
-                        val myBuilder = AlertDialog.Builder(context)
+                        val myBuilder = MaterialAlertDialogBuilder(context)
                         val packageName = apps[i - 1].pkg
 
                         val myView = layoutInflater.inflate(R.layout.privacy_options, null)

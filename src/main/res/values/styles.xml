@@ -8,6 +8,8 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     <!-- NoActionBar because we use a Toolbar widget as ActionBar -->
     <style name="KdeConnectThemeBase" parent="Theme.Material3Expressive.DynamicColors.DayNight.NoActionBar">
         <item name="android:windowBackground">?attr/colorSurface</item>
+        <item name="preferenceTheme">@style/NearoPreferenceTheme</item>
+        <item name="sliderStyle">@style/Widget.Material3Expressive.Slider.Small</item>
         <item name="toolbarStyle">@style/KdeConnectTheme.Toolbar</item>
 
         <item name="materialCardViewStyle">@style/KdeConnectCardStyle</item>
@@ -51,10 +53,42 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
 
     <style name="KdeConnectCardStyle.Filled" parent="KdeConnectCardStyle"/>
 
-    <style name="MainNavigationView" parent="Widget.Material3.NavigationView">
-        <item name="android:background">?attr/colorSurfaceContainerLow</item>
-        <item name="itemVerticalPadding">6dp</item>
-        <item name="itemTextAppearance">?attr/textAppearanceTitleSmall</item>
+    <style name="NearoPreferenceTheme" parent="PreferenceThemeOverlay">
+        <item name="preferenceStyle">@style/NearoPreference</item>
+        <item name="dialogPreferenceStyle">@style/NearoDialogPreference</item>
+        <item name="editTextPreferenceStyle">@style/NearoEditTextPreference</item>
+        <item name="switchPreferenceStyle">@style/NearoSwitchPreference</item>
+        <item name="preferenceCategoryStyle">@style/NearoPreferenceCategory</item>
+        <item name="preferenceFragmentCompatStyle">@style/NearoPreferenceFragment</item>
+    </style>
+
+    <style name="NearoPreference" parent="Preference.Material">
+        <item name="android:layout">@layout/nearo_preference</item>
+        <item name="iconSpaceReserved">false</item>
+    </style>
+
+    <style name="NearoDialogPreference" parent="Preference.DialogPreference.Material">
+        <item name="android:layout">@layout/nearo_preference</item>
+        <item name="iconSpaceReserved">false</item>
+    </style>
+
+    <style name="NearoEditTextPreference" parent="Preference.DialogPreference.EditTextPreference.Material">
+        <item name="android:layout">@layout/nearo_preference</item>
+        <item name="iconSpaceReserved">false</item>
+    </style>
+
+    <style name="NearoSwitchPreference" parent="Preference.SwitchPreference.Material">
+        <item name="android:layout">@layout/nearo_preference</item>
+        <item name="android:widgetLayout">@layout/preference_widget_material_switch</item>
+        <item name="iconSpaceReserved">false</item>
+    </style>
+
+    <style name="NearoPreferenceCategory" parent="Preference.Category.Material">
+        <item name="android:layout">@layout/nearo_preference_category</item>
+    </style>
+
+    <style name="NearoPreferenceFragment" parent="PreferenceFragment.Material">
+        <item name="android:divider">@null</item>
     </style>
 
     <style name="KdeConnectButton.IconButton" parent="Widget.Material3Expressive.Button.IconButton.Filled">

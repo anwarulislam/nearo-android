@@ -52,12 +52,14 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_volume"/>
 
-            <SeekBar
+            <com.google.android.material.slider.Slider
                 android:id="@+id/systemvolume_seek"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:max="100" />
+                android:valueTo="100"
+            app:tickVisibilityMode="hidden" />
 
         </LinearLayout>
     </LinearLayout>

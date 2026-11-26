@@ -11,13 +11,13 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/checkbox_contents"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/block_notification_contents" />
 
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/checkbox_images"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
