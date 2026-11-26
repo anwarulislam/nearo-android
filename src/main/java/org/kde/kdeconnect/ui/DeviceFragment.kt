@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -183,11 +182,16 @@ class DeviceFragment : BaseFragment<ActivityDeviceBinding>() {
                     val pairingErrorMessage by viewModel.pairingErrorMessage.collectAsStateWithLifecycle()
 
                     val header: @Composable () -> Unit = {
+                        val showReports = device.isPaired && device.isReachable
                         DeviceStatusCard(
                             name = device.name,
                             icon = device.iconDrawable,
                             state = stringResource(device.connectionLabel),
-                            details = if (device.isPaired && device.isReachable) remoteStatusDetails() else null,
+                            battery = if (showReports) device.getPlugin<BatteryPlugin>()?.remoteBatteryInfo else null,
+                            mobileNetworks = if (showReports) {
+                                device.getPlugin<ConnectivityReportPlugin>()?.remoteConnectivityInfo.orEmpty().values
+                                    .map { it.networkType }.filter { it.isNotBlank() }.distinct()
+                            } else emptyList(),
                             onDevices = { (requireActivity() as MainActivity).onDeviceSelected(null) },
                             onSettings = if (device.isPaired || device.isReachable) ({
                                 startActivity(PluginSettingsActivity.createIntent(requireContext(), deviceId))
@@ -311,46 +315,4 @@ class DeviceFragment : BaseFragment<ActivityDeviceBinding>() {
                 }
             }
         }
-
-
-    /**
-     * This method tries to display status info (battery and connectivity) for the remote device.
-     */
-    private fun remoteStatusDetails(): String? {
-        val batteryPlugin = device?.getPlugin<BatteryPlugin>()
-        val connectivityPlugin = device?.getPlugin<ConnectivityReportPlugin>()
-
-        val batteryInfo = batteryPlugin?.remoteBatteryInfo
-        val batteryStatus = if (batteryInfo != null) {
-            @StringRes
-            val resId = when {
-                batteryInfo.isCharging -> R.string.battery_status_charging_format
-                BatteryPlugin.isLowBattery(batteryInfo) -> R.string.battery_status_low_format
-                else -> R.string.battery_status_format
-            }
-            activity?.getString(resId, batteryInfo.currentCharge)
-        } else {
-            null
-        }
-
-        val connectivityInfoMap = connectivityPlugin?.remoteConnectivityInfo
-        val connectivityStatus = if (!connectivityInfoMap.isNullOrEmpty()) {
-            connectivityInfoMap.values
-                .map { it.networkType }
-                .filter { it.isNotEmpty() }
-                .distinct()
-                .joinToString(", ")
-                .ifEmpty { null }
-        } else {
-            null
-        }
-
-        return when {
-            batteryStatus != null && connectivityStatus != null -> "$batteryStatus  •  $connectivityStatus"
-            batteryStatus != null -> batteryStatus
-            connectivityStatus != null -> connectivityStatus
-            else -> null
-        }
-
-    }
 }
