@@ -32,6 +32,7 @@ jobs:
             -PpersonalVersionCode="$GITHUB_RUN_NUMBER"
 
       - name: Sign and verify APK
+        id: sign
         env:
           SIGNING_STORE: ${{ secrets.NEARO_APK_SIGNING_STORE || secrets.PERSONAL_APK_SIGNING_STORE }}
           SIGNING_PASSWORD: ${{ secrets.NEARO_APK_SIGNING_PASSWORD || secrets.PERSONAL_APK_SIGNING_PASSWORD }}
@@ -39,6 +40,11 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
+          tag="v${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
+          apk_name="Nearo-${tag}.apk"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "apk_name=$apk_name" >> "$GITHUB_OUTPUT"
+
           signer=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)
           unsigned=(build/outputs/apk/release/*-unsigned.apk)
           [[ ${#unsigned[@]} == 1 && -f ${unsigned[0]} ]]
@@ -51,30 +57,31 @@ jobs:
             unset SIGNING_STORE
             key_alias="${SIGNING_ALIAS:-personal}"
             "$signer" sign --ks "$keystore" --ks-key-alias "$key_alias" \
-              --ks-pass env:SIGNING_PASSWORD --out Nearo.apk "${unsigned[0]}"
+              --ks-pass env:SIGNING_PASSWORD --out "$apk_name" "${unsigned[0]}"
           elif [[ -f "debug.keystore" ]]; then
             echo "No signing secret found; signing with debug keystore..."
             "$signer" sign --ks debug.keystore --ks-key-alias androiddebugkey \
-              --ks-pass pass:android --out Nearo.apk "${unsigned[0]}"
+              --ks-pass pass:android --out "$apk_name" "${unsigned[0]}"
           else
             echo "No keystore found; copying unsigned APK..."
-            cp "${unsigned[0]}" Nearo.apk
+            cp "${unsigned[0]}" "$apk_name"
           fi
 
-          "$signer" verify --verbose --print-certs Nearo.apk
+          "$signer" verify --verbose --print-certs "$apk_name"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Nearo-APK
-          path: Nearo.apk
+          name: ${{ steps.sign.outputs.apk_name }}
+          path: ${{ steps.sign.outputs.apk_name }}
 
       - name: Publish versioned download
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.sign.outputs.tag }}
+          APK_NAME: ${{ steps.sign.outputs.apk_name }}
         run: |
-          tag="v${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}"
-          gh release create "$tag" Nearo.apk \
+          gh release create "$TAG" "$APK_NAME" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "Nearo · Build $GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT" \
             --notes "Nearo Android APK built from commit $GITHUB_SHA."
