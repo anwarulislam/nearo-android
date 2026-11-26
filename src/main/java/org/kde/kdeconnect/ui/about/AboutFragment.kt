@@ -19,10 +19,6 @@ import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.screen.about.AboutScreen
 
 class AboutFragment : Fragment() {
-    companion object {
-        fun newInstance(): Fragment = AboutFragment()
-    }
-
     private lateinit var aboutData: AboutData
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,11 +37,14 @@ class AboutFragment : Fragment() {
                 KdeTheme(context) {
                     AboutScreen(
                         aboutData = aboutData,
+                        onBack = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                        onContributorClicked = { openUrl(aboutData.mainContributor.webAddress) },
                         onEasterEggTriggered = {
                             startActivity(Intent(context, EasterEggActivity::class.java))
                         },
                         onReportBugClicked = { openUrl(aboutData.bugURL) },
-                        onDonateClicked = { openUrl(aboutData.donateURL) },
+                        onDonateClicked = { openUrl(aboutData.kdeDonateURL) },
+                        onKdeConnectSourceClicked = { openUrl(aboutData.kdeConnectSourceURL) },
                         onSourceCodeClicked = { openUrl(aboutData.sourceCodeURL) },
                         onLicensesClicked = {
                             startActivity(Intent(context, LicensesActivity::class.java))
@@ -53,7 +52,7 @@ class AboutFragment : Fragment() {
                         onAboutKdeClicked = {
                             startActivity(Intent(context, AboutKDEActivity::class.java))
                         },
-                        onWebsiteClicked = { openUrl(aboutData.websiteURL) },
+                        onReleasesClicked = { openUrl(aboutData.releasesURL) },
                     )
                 }
             }

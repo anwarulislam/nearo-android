@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.Spanned
@@ -32,6 +33,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kde.kdeconnect.KdeConnect
 import org.kde.kdeconnect.BackgroundService
+import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
 import org.kde.kdeconnect.helpers.CreateFileParams
 import org.kde.kdeconnect.helpers.CreateFileResultContract
 import org.kde.kdeconnect.helpers.DeviceHelper
@@ -82,11 +85,30 @@ class SettingsFragment : MaterialSettingsFragment() {
         listedDevices = null
         updatePluginSettings()
 
+        val about = Preference(context).apply {
+            setTitle(R.string.about_nearo)
+            setOnPreferenceClickListener {
+                (requireActivity() as MainActivity).openAbout()
+                true
+            }
+        }
         section(R.string.settings_support,
-            exportLogsPref(context) to R.drawable.ic_baseline_code_24
+            exportLogsPref(context) to R.drawable.ic_baseline_code_24,
+            about to R.drawable.ic_baseline_info_24
         )
 
         preferenceScreen = screen
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        listView.clipToPadding = false
+        val initialPadding = listView.paddingBottom
+        viewLifecycleOwner.lifecycleScope.launch {
+            (requireActivity() as MainActivity).navigationClearance.collect { clearance ->
+                listView.updatePadding(bottom = initialPadding + clearance)
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -250,7 +272,7 @@ class SettingsFragment : MaterialSettingsFragment() {
         setTitle(R.string.settings_export_logs)
         setSummary(R.string.settings_export_logs_text)
         onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            exportLogs.launch(CreateFileParams("text/plain", "kdeconnect-log.txt"))
+            exportLogs.launch(CreateFileParams("text/plain", "nearo-log.txt"))
             true
         }
     }
@@ -265,7 +287,7 @@ class SettingsFragment : MaterialSettingsFragment() {
                 val process = Runtime.getRuntime().exec(arrayOf("logcat", "-d"))
                 process.inputStream.reader(Charsets.UTF_8).use { reader ->
                     output.writer(Charsets.UTF_8).use { writer ->
-                        writer.write("KDE Connect ${BuildConfig.VERSION_NAME}\n")
+                        writer.write("Nearo ${BuildConfig.VERSION_NAME}\n")
                         writer.write("Android ${Build.VERSION.RELEASE} (${Build.MANUFACTURER} ${Build.MODEL})\n")
                         reader.copyTo(writer)
                     }

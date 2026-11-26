@@ -14,22 +14,31 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.preference.PreferenceManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.kde.kdeconnect.BackgroundService
 import org.kde.kdeconnect.KdeConnect
 import org.kde.kdeconnect.extensions.getSafeDrawInsets
 import org.kde.kdeconnect.extensions.setOnApplyWindowInsetsListenerCompat
 import org.kde.kdeconnect.helpers.DeviceHelper
 import org.kde.kdeconnect.ui.about.AboutFragment
+import org.kde.kdeconnect.ui.compose.KdeTheme
+import org.kde.kdeconnect.ui.compose.components.FloatingNavigation
 import org.kde.kdeconnect_tp.R
 import org.kde.kdeconnect_tp.databinding.ActivityMainBinding
 
@@ -52,11 +61,17 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         }
     }
 
+    private val dockHeight = MutableStateFlow(0)
+    internal val navigationClearance = dockHeight.asStateFlow()
+    private var selectedDestination by mutableIntStateOf(R.id.destination_devices)
     private var currentDeviceId: String? = null
     private var selectedFromList = false
     private val preferences: SharedPreferences by lazy { getSharedPreferences("stored_menu_selection", MODE_PRIVATE) }
     private val returnToDevices = object : OnBackPressedCallback(false) {
-        override fun handleOnBackPressed() = onDeviceSelected(currentDeviceId, selectedFromList)
+        override fun handleOnBackPressed() {
+            if (currentFragment is AboutFragment) returnToSettings()
+            else onDeviceSelected(currentDeviceId, selectedFromList)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,16 +88,18 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this)
         DeviceHelper.getDeviceName(this)
         onBackPressedDispatcher.addCallback(this, returnToDevices)
-        binding.destinations.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.destination_devices -> onDeviceSelected(currentDeviceId, selectedFromList)
-                R.id.destination_settings -> showDestination(item.itemId, SettingsFragment())
-                R.id.destination_about -> showDestination(item.itemId, AboutFragment.newInstance())
+        binding.destinations?.apply {
+            setOnItemSelectedListener {
+                onNavigate(it.itemId)
+                true
             }
-            true
+            setOnItemReselectedListener { onNavigate(it.itemId) }
         }
-        binding.destinations.setOnItemReselectedListener { item ->
-            if (item.itemId == R.id.destination_devices && currentDeviceId != null) onDeviceSelected(null)
+        binding.floatingDestinations?.let { dock ->
+            dock.setContent { KdeTheme(this) { FloatingNavigation(selectedDestination, ::onNavigate) } }
+            dock.addOnLayoutChangeListener { _, _, top, _, bottom, _, _, _, _ ->
+                dockHeight.value = bottom - top + (dock.layoutParams as MarginLayoutParams).bottomMargin
+            }
         }
 
         if (savedInstanceState != null) {
@@ -90,8 +107,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             selectedFromList = savedInstanceState.getBoolean(STATE_FROM_DEVICE_LIST)
             // Older versions stored a drawer item index. The restored fragment is authoritative.
             selectDestination(when (currentFragment) {
-                is SettingsFragment -> R.id.destination_settings
-                is AboutFragment -> R.id.destination_about
+                is SettingsFragment, is AboutFragment -> R.id.destination_settings
                 else -> R.id.destination_devices
             })
         } else if (!showScreenFromIntent(intent)) {
@@ -186,8 +202,36 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         showDestination(R.id.destination_devices, fragment)
     }
 
+    private fun onNavigate(id: Int) {
+        when (id) {
+            R.id.destination_devices -> {
+                if (currentFragment is DeviceFragment) onDeviceSelected(null)
+                else if (currentFragment !is PairingFragment) onDeviceSelected(currentDeviceId, selectedFromList)
+            }
+            R.id.destination_settings -> {
+                if (currentFragment is AboutFragment) returnToSettings()
+                else if (currentFragment !is SettingsFragment) showDestination(id, SettingsFragment())
+            }
+        }
+    }
+
+    fun openAbout() {
+        supportFragmentManager.beginTransaction()
+            .setReorderingAllowed(true)
+            .replace(R.id.container, AboutFragment())
+            .addToBackStack(ABOUT_BACK_STACK)
+            .commit()
+    }
+
+    private fun returnToSettings() {
+        if (!supportFragmentManager.popBackStackImmediate(ABOUT_BACK_STACK, FragmentManager.POP_BACK_STACK_INCLUSIVE)) {
+            showDestination(R.id.destination_settings, SettingsFragment())
+        }
+    }
+
     private fun selectDestination(id: Int) {
-        binding.destinations.menu.findItem(id).isChecked = true
+        selectedDestination = id
+        binding.destinations?.menu?.findItem(id)?.isChecked = true
         returnToDevices.isEnabled = id != R.id.destination_devices
     }
 
@@ -195,6 +239,9 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         get() = supportFragmentManager.findFragmentById(R.id.container)
 
     private fun showDestination(id: Int, fragment: Fragment) {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStackImmediate(ABOUT_BACK_STACK, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
         selectDestination(id)
         supportFragmentManager
             .beginTransaction()
@@ -215,6 +262,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     }
 
     companion object {
+        private const val ABOUT_BACK_STACK = "about"
         private const val TAG = "MainActivity"
 
         const val EXTRA_DEVICE_ID = "deviceId"

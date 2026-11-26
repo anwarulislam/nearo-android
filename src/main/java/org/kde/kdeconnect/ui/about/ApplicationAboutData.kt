@@ -9,19 +9,20 @@ package org.kde.kdeconnect.ui.about
 import org.kde.kdeconnect_tp.BuildConfig
 import org.kde.kdeconnect_tp.R
 
-/**
-* Add authors and credits here
- */
+private const val PROJECT_URL = "https://github.com/anwarulislam/nearo-android"
+
 val applicationAboutData = AboutData(
-        name = R.string.kde_connect,
-        icon = R.drawable.icon,
+        name = R.string.nearo_app_name,
+        icon = R.drawable.nearo_launcher_art,
         versionName = BuildConfig.VERSION_NAME,
-        bugURL = "https://bugs.kde.org/enter_bug.cgi?product=kdeconnect&amp;component=android-application",
-        websiteURL = "https://kdeconnect.kde.org/",
-        sourceCodeURL = "https://invent.kde.org/network/kdeconnect-android/",
-        donateURL = "https://kde.org/community/donations/?app=kdeconnect-android",
-        authorsFooterText = R.string.everyone_else,
-        authors = listOf(
+        bugURL = "$PROJECT_URL/issues",
+        releasesURL = "$PROJECT_URL/releases",
+        sourceCodeURL = PROJECT_URL,
+        kdeConnectSourceURL = "https://invent.kde.org/network/kdeconnect-android/",
+        kdeDonateURL = "https://kde.org/community/donations/?app=kdeconnect-android",
+        mainContributor = AboutPerson("Anwarul Islam", webAddress = "https://github.com/anwarulislam"),
+        kdeConnectAuthorsFooterText = R.string.everyone_else,
+        kdeConnectAuthors = listOf(
             // Have you made some contributions and think your name should be here? Open a MR to add yourself to the list :)
             AboutPerson("Albert Vaca Cintora", R.string.maintainer_and_developer, "albertvaka+kde@gmail.com"),
             AboutPerson("Aleix Pol", R.string.developer, "aleixpol@kde.org"),

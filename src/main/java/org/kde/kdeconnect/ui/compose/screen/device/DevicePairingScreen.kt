@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.kde.kdeconnect.PairingHandler
+import org.kde.kdeconnect.ui.compose.components.mainNavigationBottomPadding
 import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.components.DeviceIcon
 import org.kde.kdeconnect.ui.compose.components.KdeThemePreviews
@@ -69,7 +70,7 @@ private fun DevicePairingScreenContent(
     onRejectPairing: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp),
+        modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(bottom = mainNavigationBottomPadding()).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {

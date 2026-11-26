@@ -31,7 +31,7 @@
   <string name="send_ping">Пошаљи пинг</string>
   <string name="open_mpris_controls">Контрола мултимедије</string>
   <string name="remotekeyboard_editing_only_title">Користи даљинске дугмиће само при уређивању</string>
-  <string name="remotekeyboard_not_connected">Нема активне везе даљинске тастатуре. Успоставите је у КДЕ‑конекцији</string>
+  <string name="remotekeyboard_not_connected">Нема активне везе даљинске тастатуре. Успоставите је у Nearo</string>
   <string name="remotekeyboard_connected">Веза даљинске тастатуре је активна</string>
   <string name="remotekeyboard_multiple_connections">Постоји више од једне везе даљинске тастатуре. Изаберите уређај да бисте подесили</string>
   <string name="open_mousepad">Даљински унос</string>
@@ -121,8 +121,8 @@
   <string name="sftp_camera">Слике са камере</string>
   <string name="no_players_connected">Нисам нашао плејере</string>
   <string name="send_files">Пошаљи фајлове</string>
-  <string name="pairing_title">Уређаји КДЕ‑конекције</string>
-  <string name="pairing_description">Други уређаји на вашој мрежи на којима ради КДЕ‑конекција, појавиће се овде.</string>
+  <string name="pairing_title">Уређаји Nearo</string>
+  <string name="pairing_description">Други уређаји на вашој мрежи на којима ради Nearo или КДЕ‑конекција, појавиће се овде.</string>
   <string name="device_rename_title">Преименовање уређаја</string>
   <string name="device_rename_confirm">Преименуј</string>
   <string name="refresh">Освежи</string>

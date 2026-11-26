@@ -2,7 +2,6 @@
 <!-- SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:baselineAligned="false"
     android:orientation="horizontal"
     android:layout_width="match_parent"
@@ -16,8 +15,7 @@
         app:menuGravity="center"
         android:id="@+id/destinations"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/main_destinations"
-        tools:viewBindingType="com.google.android.material.navigation.NavigationBarView" />
+        app:menu="@menu/main_destinations" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/container"

@@ -40,7 +40,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import org.kde.kdeconnect.extensions.safeDrawingBottomPadding
+import org.kde.kdeconnect.ui.compose.components.mainNavigationBottomPadding
 import org.kde.kdeconnect.plugins.Plugin
 import org.kde.kdeconnect.plugins.clipboard.ClipboardPlugin
 import org.kde.kdeconnect.plugins.mpris.MprisPlugin
@@ -84,7 +84,7 @@ private fun PluginsScreenContent(
     actionNeedPermissions: (plugin: Plugin) -> Unit,
     actionNeedOptionalPermissions: (plugin: Plugin) -> Unit,
 ) {
-    val bottomPadding = safeDrawingBottomPadding().calculateBottomPadding()
+    val bottomPadding = mainNavigationBottomPadding()
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(

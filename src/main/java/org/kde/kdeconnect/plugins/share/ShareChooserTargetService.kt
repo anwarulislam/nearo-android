@@ -25,7 +25,7 @@ class ShareChooserTargetService : ChooserTargetService() {
             .onEach { d -> Log.d("DirectShare", d.name) }
             .map { d ->
                 val targetName = d.name
-                val targetIcon = Icon.createWithResource(this, R.drawable.icon)
+                val targetIcon = Icon.createWithResource(this, R.mipmap.ic_launcher)
                 val targetRanking = 1f
                 val targetComponentName = ComponentName(packageName, ShareActivity::class.java.canonicalName!!)
                 val targetExtras = Bundle().apply {

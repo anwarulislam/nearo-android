@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-  <string name="kde_connect">جسر كِيدِي</string>
   <string name="manifest_label_share">أرسِل إلى جهاز</string>
   <string name="foreground_notification_no_devices">غير متصل بأي جهاز</string>
   <string name="foreground_notification_devices">متّصل بـ: %s</string>
@@ -53,12 +52,12 @@
   <string name="open_input_settings">افتح إعدادات لوحة المفاتيح</string>
   <string name="no_permissions">عليك إعطاء التّطبيق صلاحيّات للنّفاذ إلى الإشعارات</string>
   <string name="no_permission_mprisreceiver">لتكون قادرًا على التحكم في مشغلات الوسائط الخاصة بك، تحتاج إلى منح حق الوصول إلى الإشعارات</string>
-  <string name="no_permissions_remotekeyboard_ime">لتلقي ضغطات المفاتيح تحتاج إلى تنشيط لوحة المفاتيح البعيدة لجسر كِيدِي لتكون وسيلة إدخال لأندرويد</string>
+  <string name="no_permissions_remotekeyboard_ime">لتلقي ضغطات المفاتيح تحتاج إلى تنشيط لوحة المفاتيح البعيدة لNearo لتكون وسيلة إدخال لأندرويد</string>
   <string name="no_permissions_remotekeyboard_accessibility">لتلقي ضغطات المفاتيح، عليك منح أذونات الإتاحة.</string>
   <string name="send_ping">أرسل وخزة ping</string>
   <string name="open_mpris_controls">متحكّمات الوسائط المتعدّدة</string>
   <string name="remotekeyboard_editing_only_title">التعامل مع المفاتيح البعيدة فقط عند التحرير</string>
-  <string name="remotekeyboard_not_connected">لا يوجد اتصال لوحة المفاتيح بعيدة نشط، وإنشاء واحد في جسر كِيدِي</string>
+  <string name="remotekeyboard_not_connected">لا يوجد اتصال لوحة المفاتيح بعيدة نشط، وإنشاء واحد في Nearo</string>
   <string name="remotekeyboard_connected">اتصال لوحة المفاتيح بعيدة نشط</string>
   <string name="remotekeyboard_multiple_connections">هناك أكثر من اتصال لوحة مفاتيح بعيدة، حدد الجهاز لتضبطه</string>
   <string name="open_mousepad">الإدخال البعيد</string>
@@ -244,7 +243,7 @@
   </string-array>
   <string name="mpris_notifications_explanation">يلزم الحصول على إذن الإشعارات لإظهار الوسائط البعيدة في درج الإشعارات</string>
   <string name="mpris_notification_settings_title">أظهر إشعار التحكم في الوسائط</string>
-  <string name="mpris_notification_settings_summary">اسمح بالتحكم في مشغلات الوسائط دون فتح جسر كِيدِي</string>
+  <string name="mpris_notification_settings_summary">اسمح بالتحكم في مشغلات الوسائط دون فتح Nearo</string>
   <string name="share_to">شارك مع…</string>
   <string name="unreachable_device_dynamic_shortcut">%s (✕)</string>
   <string name="unreachable_device_url_share_text">شاركنا العناوين إلى جهاز لا يمكن الوصول إليه، ستُسلم إليه بمجرد أن يصبح الوصول إليه ممكنًا.\n\n</string>
@@ -285,7 +284,7 @@
   <string name="sftp_action_mode_menu_delete">احذف</string>
   <string name="sftp_no_storage_locations_configured">لا توجد مواقع تخزين مضبوطة</string>
   <string name="sftp_saf_permission_explanation">للوصول إلى الملفات عن بُعد عليك ضبط مواقع التخزين</string>
-  <string name="sftp_manage_storage_permission_explanation">للسماح بالوصول عن بُعد إلى الملفات الموجودة على هذا الجهاز، يجب أن تسمح لـ جسر كِيدِي بإدارة التخزين.</string>
+  <string name="sftp_manage_storage_permission_explanation">للسماح بالوصول عن بُعد إلى الملفات الموجودة على هذا الجهاز، يجب أن تسمح لـ Nearo بإدارة التخزين.</string>
   <string name="sftp_missing_permission_error">أذون مفقودة: الوصول إلى نظام الملفات</string>
   <string name="sftp_could_not_determine_ip">تعذّر تحديد عنوان IP المحلي</string>
   <string name="no_players_connected">لم يُعثر على مشغّلات</string>
@@ -305,8 +304,8 @@
   </string-array>
   <string name="block_notification_contents">احظر محتويات الإشعار</string>
   <string name="block_notification_images">احظر صور الإشعار</string>
-  <string name="pairing_title">أجهزة «جسر كِيدِي»</string>
-  <string name="pairing_description">الأجهزة الأخرى التي تشغّل «جسر كِيدِي» وعلى نفس الشّبكة ستظهر هنا.</string>
+  <string name="pairing_title">أجهزة «Nearo»</string>
+  <string name="pairing_description">الأجهزة الأخرى التي تشغّل «Nearo أو جسر كِيدِي» وعلى نفس الشّبكة ستظهر هنا.</string>
   <string name="device_rename_title">أعد تسمية الجهاز</string>
   <string name="device_rename_confirm">أعد التّسمية</string>
   <string name="refresh">حدّث</string>
@@ -318,7 +317,7 @@
   <string name="pref_plugin_telepathy">أرسل رسالة نصية قصيرة</string>
   <string name="pref_plugin_telepathy_desc">أرسل رسائل نصّيّة من سطح المكتب</string>
   <string name="pref_plugin_telepathy_mms">أرسل رسالة وسائط</string>
-  <string name="pref_plugin_telepathy_mms_desc">لتتمكن من إرسال رسائل الوسائط المتعددة من جسر كِيدِي، عليك تعيينه كتطبيق الرسائل القصيرة المبدئي.</string>
+  <string name="pref_plugin_telepathy_mms_desc">لتتمكن من إرسال رسائل الوسائط المتعددة من Nearo، عليك تعيينه كتطبيق الرسائل القصيرة المبدئي.</string>
   <string name="findmyphone_title">جِد جهازي</string>
   <string name="findmyphone_title_tablet">جِد جهازي اللوحيّ</string>
   <string name="findmyphone_title_tv">جِد تلفازي</string>
@@ -386,7 +385,7 @@
   <string name="devices">الأجهزة</string>
   <string name="settings_rename">اسم الجهاز</string>
   <string name="settings_dark_mode">سمة مظلمة</string>
-  <string name="settings_export_logs">صدّر سجل جسر كِيدِي</string>
+  <string name="settings_export_logs">صدّر سجل Nearo</string>
   <string name="settings_export_logs_text">أنشئ ملفًا يحتوي على معلومات التنفيذ التي يمكن أن تساعد في استكشاف المشكلات وإصلاحها.</string>
   <string name="settings_more_settings_title">المزيد من الإعدادات</string>
   <string name="settings_more_settings_text">يمكن العثور على إعدادات لكل جهاز ضمن ”إعدادات الملحقة“ من داخل الجهاز.</string>
@@ -401,7 +400,7 @@
   <string name="notification_channel_receivenotification">إشعارات من أجهزة أخرى</string>
   <string name="findmyphone_preference_title_flashlight">شغّل المصباح</string>
   <string name="no_app_for_opening">لا يوجد تطبيق مناسب لفتح هذا الملف</string>
-  <string name="remote_keyboard_service">لوحة مفاتيح بعيده لجسر كِيدِي</string>
+  <string name="remote_keyboard_service">لوحة مفاتيح بعيده لNearo</string>
   <string name="presenter_pointer">المؤشر</string>
   <string name="trusted_networks">الشّبكات الموثوقة</string>
   <string name="trusted_networks_desc">اقَصْر الاكتشاف الآليّ على الشبكات المعروفة</string>
@@ -409,8 +408,8 @@
   <string name="empty_trusted_networks_list_text">لم تضف أي شبكة موثوق بها حتى الآن</string>
   <string name="allow_all_networks_text">اسمح للكل</string>
   <string name="location_permission_needed_title">الإذن مطلوب</string>
-  <string name="bluetooth_permission_needed_desc">يحتاج جسر كِيدِي إلى إذن للاتصال بالأجهزة القريبة لإتاحة الأجهزة المقترنة باستخدام البلوتوث في جسر كِيدِي.</string>
-  <string name="location_permission_needed_desc">يحتاج جسر كِيدِي إلى إذن الموقع في الخلفية لمعرفة شبكة الواي فاي التي تتصل بها حتى عندما يكون التطبيق في الخلفية. وذلك لأنه يمكن استخدام اسم شبكات الواي فاي من حولك للعثور على موقعك، حتى وإن لم يكن هذا ما يفعله جسر كِيدِي.</string>
+  <string name="bluetooth_permission_needed_desc">يحتاج Nearo إلى إذن للاتصال بالأجهزة القريبة لإتاحة الأجهزة المقترنة باستخدام البلوتوث في Nearo.</string>
+  <string name="location_permission_needed_desc">يحتاج Nearo إلى إذن الموقع في الخلفية لمعرفة شبكة الواي فاي التي تتصل بها حتى عندما يكون التطبيق في الخلفية. وذلك لأنه يمكن استخدام اسم شبكات الواي فاي من حولك للعثور على موقعك، حتى وإن لم يكن هذا ما يفعله Nearo.</string>
   <string name="clipboard_android_x_incompat">أزال أندرويد 10 الوصول للحافظة إلى جميع التطبيقات. ستعطل هذه الملحقة.</string>
   <string name="mpris_open_url">استمر في التشغيل هنا</string>
   <string name="cant_open_url">تعذر فتح العنوان للاستمرار في التشغيل</string>

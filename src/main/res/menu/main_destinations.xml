@@ -3,5 +3,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/destination_devices" android:title="@string/devices" android:icon="@drawable/ic_phonelink_36dp" />
     <item android:id="@+id/destination_settings" android:title="@string/settings" android:icon="@drawable/ic_settings_24dp" />
-    <item android:id="@+id/destination_about" android:title="@string/about" android:icon="@drawable/ic_baseline_info_24" />
 </menu>

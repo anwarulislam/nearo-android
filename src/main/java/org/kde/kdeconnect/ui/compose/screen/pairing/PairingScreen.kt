@@ -41,7 +41,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import org.kde.kdeconnect.extensions.safeDrawingBottomPadding
+import org.kde.kdeconnect.ui.compose.components.mainNavigationBottomPadding
 import org.kde.kdeconnect.ui.compose.KdeTheme
 import org.kde.kdeconnect.ui.compose.components.DeviceIcon
 import org.kde.kdeconnect.ui.compose.components.DeviceListItem
@@ -70,7 +70,7 @@ fun PairingScreen(
             modifier = Modifier.align(Alignment.TopCenter).widthIn(max = 760.dp).fillMaxSize(),
             contentPadding = PaddingValues(
                 start = 16.dp, end = 16.dp, top = 8.dp,
-                bottom = safeDrawingBottomPadding().calculateBottomPadding() + 20.dp
+                bottom = mainNavigationBottomPadding() + 20.dp
             ),
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {

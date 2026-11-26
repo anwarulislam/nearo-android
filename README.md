@@ -1,37 +1,29 @@
-# KDE Connect - Android app
+# Nearo for Android
 
-KDE Connect is a multi-platform app that allows your devices to communicate (eg: your phone and your computer).
+Nearo is a port of KDE Connect for Android with additional features, including a Material You interface and Mac Spaces controls. It connects your Android phone or tablet to Nearo on macOS and to devices running KDE Connect.
 
-## (Some) Features
-- **Shared clipboard**: copy and paste between your phone and your computer (or any other device).
-- **Notification sync**: Read and reply to your Android notifications from the desktop.
-- **Share files and URLs** instantly from one device to another.
-- **Multimedia remote control**: Use your phone as a remote for Linux media players.
-- **Virtual touchpad**: Use your phone screen as your computer's touchpad and keyboard.
+KDE Connect provides the underlying pairing and encrypted communication, file and clipboard sharing, notification replies, media controls, and remote input.
 
-All this without wires, over the already existing Wi-Fi network, and using TLS encryption.
+## Installation
 
-## About this app
+Download `Nearo.apk` on a device running Android 7.0 or newer. Open Nearo on Android and Nearo or KDE Connect on the other device. Select the other device under **Devices** and accept the pairing request. [Download the Android APK](https://github.com/anwarulislam/nearo-android/releases/latest)
 
-This is a native Android port of the KDE Connect Qt app. You will find a more complete readme about KDE Connect [here](https://invent.kde.org/network/kdeconnect-kde/).
+## Development
 
-## How to install this app
+Build a debug APK with JDK 21 and the Android SDK installed.
 
-You can install this app from the [Play Store](https://play.google.com/store/apps/details?id=org.kde.kdeconnect_tp) as well as [F-Droid](https://f-droid.org/repository/browse/?fdid=org.kde.kdeconnect_tp). Note you will also need to install the [desktop app](https://invent.kde.org/network/kdeconnect-kde) for it to work.
+```sh
+./gradlew assembleDebug
+```
 
-## Contributing
+Report Nearo issues and submit changes in this repository. [Issues](https://github.com/anwarulislam/nearo-android/issues) · [Pull requests](https://github.com/anwarulislam/nearo-android/pulls)
 
-A lot of useful information, including how to get started working on KDE Connect and how to connect with the current developers, is on our [KDE Community Wiki page](https://community.kde.org/KDEConnect)
+## Credits
 
-For bug reporting, please use [KDE's Bugzilla](https://bugs.kde.org). Please do not use the issue tracker in GitLab since we want to keep everything in one place.
+**Anwarul Islam** is the main contributor to Nearo. [GitHub profile](https://github.com/anwarulislam)
 
-To contribute patches, use [KDE Connect's Gitlab](https://invent.kde.org/network/kdeconnect-android/).
-On Gitlab (as well as on our [old Phabricator](https://phabricator.kde.org/tag/kde_connect/)) you can find a task list with stuff to do and links to other relevant resources.
-It is a good idea to also subscribe to the [KDE Connect mailing list](https://mail.kde.org/mailman/listinfo/kdeconnect).
-
-Please know that all translations for all KDE apps are handled by the [localization team](https://l10n.kde.org/). If you would like to submit a translation, that should be done by working with the proper team for that language.
+The original KDE Connect developers and their roles are listed under **Settings → About Nearo → KDE Connect development**. The KDE localization teams provided the upstream translations. [KDE Connect for Android](https://invent.kde.org/network/kdeconnect-android/)
 
 ## License
-[GNU GPL v2](https://www.gnu.org/licenses/gpl-2.0.html) and [GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.html)
 
-If you are reading this from GitHub, you should know that this is just a mirror of the [KDE Project repo](https://invent.kde.org/network/kdeconnect-android/).
+See [COPYING](COPYING) and the [license texts](LICENSES/) for the terms that apply to this project.

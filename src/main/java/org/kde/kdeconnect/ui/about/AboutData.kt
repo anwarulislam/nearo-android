@@ -13,9 +13,11 @@ data class AboutData(@StringRes val name: Int,
                      @DrawableRes val icon: Int,
                      val versionName: String,
                      val bugURL: String? = null,
-                     val websiteURL: String? = null,
+                     val releasesURL: String? = null,
                      val sourceCodeURL: String? = null,
-                     val donateURL: String? = null,
-                     @StringRes val authorsFooterText: Int? = null,
-                     val authors: List<AboutPerson> = mutableListOf()
+                     val kdeConnectSourceURL: String,
+                     val kdeDonateURL: String? = null,
+                     @StringRes val kdeConnectAuthorsFooterText: Int? = null,
+                     val mainContributor: AboutPerson,
+                     val kdeConnectAuthors: List<AboutPerson> = mutableListOf()
 )
